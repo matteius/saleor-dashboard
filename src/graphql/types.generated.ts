@@ -153,6 +153,11 @@ export type AccountRegisterInput = {
   redirectUrl?: InputMaybe<Scalars['String']>;
 };
 
+/** Filtering options for addresses. */
+export type AddressFilterInput = {
+  phoneNumber?: InputMaybe<StringFilterInput>;
+};
+
 export type AddressInput = {
   /** City. */
   city?: InputMaybe<Scalars['String']>;
@@ -823,6 +828,21 @@ export type CardInput = {
   money: MoneyInput;
 };
 
+export type CardPaymentMethodDetailsInput = {
+  /** Brand of the payment method used for the transaction. Max length is 40 characters. */
+  brand?: InputMaybe<Scalars['String']>;
+  /** Expiration month of the card used for the transaction. Value must be between 1 and 12. */
+  expMonth?: InputMaybe<Scalars['Int']>;
+  /** Expiration year of the card used for the transaction. Value must be between 2000 and 9999. */
+  expYear?: InputMaybe<Scalars['Int']>;
+  /** First digits of the card used for the transaction. Max length is 4 characters. */
+  firstDigits?: InputMaybe<Scalars['String']>;
+  /** Last digits of the card used for the transaction. Max length is 4 characters. */
+  lastDigits?: InputMaybe<Scalars['String']>;
+  /** Name of the payment method used for the transaction. Max length is 256 characters. */
+  name: Scalars['String'];
+};
+
 export type CatalogueInput = {
   /** Categories related to the discount. */
   categories?: InputMaybe<Array<Scalars['ID']>>;
@@ -1383,10 +1403,11 @@ export enum CollectionSortField {
    * Sort collections by publication date.
    *
    * This option requires a channel filter to work as the values can vary between channels.
+   * @deprecated Use `PUBLISHED_AT` instead.
    */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /**
-   * Sort collections by publication date.
+   * Sort collections by published at.
    *
    * This option requires a channel filter to work as the values can vary between channels.
    */
@@ -1789,6 +1810,28 @@ export type CustomerInput = {
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
 };
 
+export type CustomerWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<CustomerWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<CustomerWhereInput>>;
+  /** Filter by addresses data associated with user. */
+  addresses?: InputMaybe<AddressFilterInput>;
+  /** Filter by date joined. */
+  dateJoined?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by email address. */
+  email?: InputMaybe<StringFilterInput>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filter by whether the user is active. */
+  isActive?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by date when orders were placed. */
+  placedOrdersAt?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by last updated date. */
+  updatedAt?: InputMaybe<DateTimeRangeInput>;
+};
+
 export type DateRangeInput = {
   /** Start date. */
   gte?: InputMaybe<Scalars['Date']>;
@@ -2132,6 +2175,7 @@ export enum ExportFileSortField {
   CREATED_AT = 'CREATED_AT',
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   STATUS = 'STATUS',
+  /** @deprecated Use `LAST_MODIFIED_AT` instead. */
   UPDATED_AT = 'UPDATED_AT'
 }
 
@@ -2221,8 +2265,10 @@ export type FulfillmentCancelInput = {
   warehouseId?: InputMaybe<Scalars['ID']>;
 };
 
-/** Filter input for fulfillments. */
+/** Filter input for order fulfillments data. */
 export type FulfillmentFilterInput = {
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
   /** Filter by fulfillment status. */
   status?: InputMaybe<FulfillmentStatusEnumFilterInput>;
 };
@@ -3295,6 +3341,12 @@ export enum LanguageCodeEnum {
   ZU_ZA = 'ZU_ZA'
 }
 
+/** Filter input for order lines data. */
+export type LinesFilterInput = {
+  /** Filter by metadata fields of order lines. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+};
+
 /**
  * Determine the mark as paid strategy for the channel.
  *
@@ -3494,11 +3546,37 @@ export type MetadataFilter = {
   value?: InputMaybe<Scalars['String']>;
 };
 
+/**
+ * Allows filtering based on metadata key/value pairs.
+ *
+ *         Examples:
+ *         - `{key: "size"}`
+ *           Matches objects where the metadata key "size" exists, regardless of its value.
+ *         - `{key: "color", value: {oneOf: ["blue", "green"]}}`
+ *           Matches objects where the metadata key "color" is set to either "blue" or "green".
+ *         - `{key: "status", value: {eq: "active"}}`
+ *           Matches objects where the metadata key "status" is set to "active".
+ */
+export type MetadataFilterInput = {
+  /** Key to filter by. If not other fields provided - checking the existence of the key in metadata. */
+  key: Scalars['String'];
+  /** Value to filter by. */
+  value?: InputMaybe<MetadataValueFilterInput>;
+};
+
 export type MetadataInput = {
   /** Key of a metadata item. */
   key: Scalars['String'];
   /** Value of a metadata item. */
   value: Scalars['String'];
+};
+
+/** Define the filtering options for metadata value fields. */
+export type MetadataValueFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<Scalars['String']>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type MoneyInput = {
@@ -3963,6 +4041,21 @@ export enum OrderErrorCode {
   ZERO_QUANTITY = 'ZERO_QUANTITY'
 }
 
+/** Filter input for order events data. */
+export type OrderEventFilterInput = {
+  /** Filter order events by date. */
+  date?: InputMaybe<DateTimeRangeInput>;
+  /** Filter order events by type. */
+  type?: InputMaybe<OrderEventTypeEnumFilterInput>;
+};
+
+export type OrderEventTypeEnumFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<OrderEventsEnum>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<OrderEventsEnum>>;
+};
+
 export enum OrderEventsEmailsEnum {
   CONFIRMED = 'CONFIRMED',
   DIGITAL_LINKS = 'DIGITAL_LINKS',
@@ -4342,20 +4435,32 @@ export type OrderSettingsUpdateInput = {
 export enum OrderSortField {
   /** Sort orders by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort orders by creation date. */
+  /**
+   * Sort orders by creation date
+   * @deprecated Use `CREATED_AT` instead.
+   */
   CREATION_DATE = 'CREATION_DATE',
   /** Sort orders by customer. */
   CUSTOMER = 'CUSTOMER',
-  /** Sort orders by fulfillment status. */
+  /**
+   * Sort orders by fulfillment status.
+   * @deprecated Use `STATUS` instead.
+   */
   FULFILLMENT_STATUS = 'FULFILLMENT_STATUS',
-  /** Sort orders by last modified at. */
+  /** Sort orders by last modified date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort orders by number. */
   NUMBER = 'NUMBER',
-  /** Sort orders by payment. */
+  /** Sort orders by payment status. */
   PAYMENT = 'PAYMENT',
   /** Sort orders by rank. Note: This option is available only with the `search` filter. */
-  RANK = 'RANK'
+  RANK = 'RANK',
+  /**
+   * Sort orders by order status.
+   *
+   * Added in Saleor 3.22.
+   */
+  STATUS = 'STATUS'
 }
 
 export type OrderSortingInput = {
@@ -4450,6 +4555,8 @@ export type OrderWhereInput = {
   checkoutToken?: InputMaybe<UuidFilterInput>;
   /** Filter order by created at date. */
   createdAt?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by order events. */
+  events?: InputMaybe<OrderEventFilterInput>;
   /** Filter by fulfillment data associated with the order. */
   fulfillments?: InputMaybe<FulfillmentFilterInput>;
   /** Filter by whether the order has any fulfillments. */
@@ -4467,10 +4574,16 @@ export type OrderWhereInput = {
   isGiftCardUsed?: InputMaybe<Scalars['Boolean']>;
   /** Filter by whether the order contains preorder items. */
   isPreorder?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by metadata fields of order lines. */
+  lines?: InputMaybe<LinesFilterInput>;
   /** Filter by number of lines in the order. */
   linesCount?: InputMaybe<IntFilterInput>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
   /** Filter by order number. */
   number?: InputMaybe<IntFilterInput>;
+  /** Filter by the product type of related order lines. */
+  productTypeId?: InputMaybe<GlobalIdFilterInput>;
   /** Filter by order status. */
   status?: InputMaybe<OrderStatusEnumFilterInput>;
   /** Filter by total gross amount of the order. */
@@ -4485,6 +4598,11 @@ export type OrderWhereInput = {
   userEmail?: InputMaybe<StringFilterInput>;
   /** Filter by voucher code used in the order. */
   voucherCode?: InputMaybe<StringFilterInput>;
+};
+
+export type OtherPaymentMethodDetailsInput = {
+  /** Name of the payment method used for the transaction. */
+  name: Scalars['String'];
 };
 
 export type PageCreateInput = {
@@ -4556,9 +4674,15 @@ export type PageInput = {
 export enum PageSortField {
   /** Sort pages by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort pages by creation date. */
+  /**
+   * Sort pages by creation date.
+   * @deprecated Use `CREATED_AT` instead.
+   */
   CREATION_DATE = 'CREATION_DATE',
-  /** Sort pages by publication date. */
+  /**
+   * Sort pages by publication date.
+   * @deprecated Use `PUBLISHED_AT` instead.
+   */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /** Sort pages by publication date. */
   PUBLISHED_AT = 'PUBLISHED_AT',
@@ -4627,6 +4751,20 @@ export type PageTypeUpdateInput = {
   removeAttributes?: InputMaybe<Array<Scalars['ID']>>;
   /** Page type slug. */
   slug?: InputMaybe<Scalars['String']>;
+};
+
+export type PageWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<PageWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<PageWhereInput>>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by page type. */
+  pageType?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by page slug. */
+  slug?: InputMaybe<StringFilterInput>;
 };
 
 export enum PaymentChargeStatusEnum {
@@ -4736,6 +4874,18 @@ export type PaymentInput = {
   storePaymentMethod?: InputMaybe<StorePaymentMethodEnum>;
   /** Client-side generated payment token, representing customer's billing data in a secure manner. */
   token?: InputMaybe<Scalars['String']>;
+};
+
+/**
+ * Details of the payment method used for the transaction. One of `card` or `other` is required.
+ *
+ * Added in Saleor 3.22.
+ */
+export type PaymentMethodDetailsInput = {
+  /** Details of the card payment method used for the transaction. */
+  card?: InputMaybe<CardPaymentMethodDetailsInput>;
+  /** Details of the non-card payment method used for this transaction. */
+  other?: InputMaybe<OtherPaymentMethodDetailsInput>;
 };
 
 export enum PaymentMethodInitializeTokenizationErrorCode {
@@ -5299,9 +5449,15 @@ export enum ProductOrderField {
   COLLECTION = 'COLLECTION',
   /** Sort products by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort products by update date. */
+  /**
+   * Sort products by update date.
+   * @deprecated Use `LAST_MODIFIED_AT` instead.
+   */
   DATE = 'DATE',
-  /** Sort products by update date. */
+  /**
+   * Sort products by update date.
+   * @deprecated Use `LAST_MODIFIED_AT` instead.
+   */
   LAST_MODIFIED = 'LAST_MODIFIED',
   /** Sort products by update date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
@@ -5323,6 +5479,7 @@ export enum ProductOrderField {
    * Sort products by publication date.
    *
    * This option requires a channel filter to work as the values can vary between channels.
+   * @deprecated Use `PUBLISHED_AT` instead.
    */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /**
@@ -5624,7 +5781,7 @@ export type ProductVariantInput = {
 };
 
 export enum ProductVariantSortField {
-  /** Sort products variants by last modified at. */
+  /** Sort product variants by last modification date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
 }
 
@@ -5925,7 +6082,7 @@ export type PromotionRuleUpdateInput = {
 };
 
 export enum PromotionSortField {
-  /** Sort promotions by created at. */
+  /** Sort promotions by creation date. */
   CREATED_AT = 'CREATED_AT',
   /** Sort promotions by end date. */
   END_DATE = 'END_DATE',
@@ -6076,11 +6233,11 @@ export type SaleInput = {
 };
 
 export enum SaleSortField {
-  /** Sort sales by created at. */
+  /** Sort sales by creation date. */
   CREATED_AT = 'CREATED_AT',
   /** Sort sales by end date. */
   END_DATE = 'END_DATE',
-  /** Sort sales by last modified at. */
+  /** Sort sales by last modification date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort sales by name. */
   NAME = 'NAME',
@@ -6757,6 +6914,12 @@ export type TransactionCreateInput = {
   /** Payment name of the transaction. */
   name?: InputMaybe<Scalars['String']>;
   /**
+   * Details of the payment method used for the transaction.
+   *
+   * Added in Saleor 3.22.
+   */
+  paymentMethodDetails?: InputMaybe<PaymentMethodDetailsInput>;
+  /**
    * Payment private metadata. Requires permissions to modify and to read the metadata of the object it's attached to.
    *
    * Warning: never store sensitive information, including financial data such as credit card details.
@@ -6921,6 +7084,12 @@ export type TransactionUpdateInput = {
   metadata?: InputMaybe<Array<MetadataInput>>;
   /** Payment name of the transaction. */
   name?: InputMaybe<Scalars['String']>;
+  /**
+   * Details of the payment method used for the transaction.
+   *
+   * Added in Saleor 3.22.
+   */
+  paymentMethodDetails?: InputMaybe<PaymentMethodDetailsInput>;
   /**
    * Payment private metadata. Requires permissions to modify and to read the metadata of the object it's attached to.
    *
@@ -7174,7 +7343,10 @@ export type VoucherInput = {
 };
 
 export enum VoucherSortField {
-  /** Sort vouchers by code. */
+  /**
+   * Sort vouchers by code.
+   * @deprecated Field no longer supported
+   */
   CODE = 'CODE',
   /** Sort vouchers by end date. */
   END_DATE = 'END_DATE',
