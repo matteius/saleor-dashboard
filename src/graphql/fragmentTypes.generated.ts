@@ -11,6 +11,11 @@
       "AppExtensionOptionsNewTab",
       "AppExtensionOptionsWidget"
     ],
+    "AttributeValueReferencedObject": [
+      "Page",
+      "Product",
+      "ProductVariant"
+    ],
     "CheckoutLineProblem": [
       "CheckoutLineProblemInsufficientStock",
       "CheckoutLineProblemVariantNotAvailable"
@@ -185,6 +190,10 @@
       "WarehouseMetadataUpdated",
       "WarehouseUpdated"
     ],
+    "GenericPaymentMethodDetails": [
+      "CardPaymentMethodDetails",
+      "OtherPaymentMethodDetails"
+    ],
     "IssuingPrincipal": [
       "App",
       "User"
@@ -334,6 +343,10 @@
     "OrderOrCheckout": [
       "Checkout",
       "Order"
+    ],
+    "PaymentMethodDetails": [
+      "CardPaymentMethodDetails",
+      "OtherPaymentMethodDetails"
     ],
     "PromotionEvent": [
       "PromotionCreatedEvent",
