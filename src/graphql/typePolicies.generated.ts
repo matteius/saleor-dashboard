@@ -503,7 +503,7 @@ export type AssignedVariantAttributeFieldPolicy = {
 	attribute?: FieldPolicy<any> | FieldReadFunction<any>,
 	variantSelection?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type AttributeKeySpecifier = ('availableInGrid' | 'choices' | 'entityType' | 'externalReference' | 'filterableInDashboard' | 'filterableInStorefront' | 'id' | 'inputType' | 'metadata' | 'metafield' | 'metafields' | 'name' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'productTypes' | 'productVariantTypes' | 'slug' | 'storefrontSearchPosition' | 'translation' | 'type' | 'unit' | 'valueRequired' | 'visibleInStorefront' | 'withChoices' | AttributeKeySpecifier)[];
+export type AttributeKeySpecifier = ('availableInGrid' | 'choices' | 'entityType' | 'externalReference' | 'filterableInDashboard' | 'filterableInStorefront' | 'id' | 'inputType' | 'metadata' | 'metafield' | 'metafields' | 'name' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'productTypes' | 'productVariantTypes' | 'slug' | 'storefrontSearchPosition' | 'translation' | 'type' | 'unit' | 'valueRequired' | 'values' | 'visibleInStorefront' | 'withChoices' | AttributeKeySpecifier)[];
 export type AttributeFieldPolicy = {
 	availableInGrid?: FieldPolicy<any> | FieldReadFunction<any>,
 	choices?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -528,6 +528,7 @@ export type AttributeFieldPolicy = {
 	type?: FieldPolicy<any> | FieldReadFunction<any>,
 	unit?: FieldPolicy<any> | FieldReadFunction<any>,
 	valueRequired?: FieldPolicy<any> | FieldReadFunction<any>,
+	values?: FieldPolicy<any> | FieldReadFunction<any>,
 	visibleInStorefront?: FieldPolicy<any> | FieldReadFunction<any>,
 	withChoices?: FieldPolicy<any> | FieldReadFunction<any>
 };
@@ -674,7 +675,7 @@ export type AttributeUpdatedFieldPolicy = {
 	recipient?: FieldPolicy<any> | FieldReadFunction<any>,
 	version?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type AttributeValueKeySpecifier = ('boolean' | 'date' | 'dateTime' | 'externalReference' | 'file' | 'id' | 'inputType' | 'name' | 'plainText' | 'reference' | 'richText' | 'slug' | 'translation' | 'value' | AttributeValueKeySpecifier)[];
+export type AttributeValueKeySpecifier = ('boolean' | 'date' | 'dateTime' | 'externalReference' | 'file' | 'id' | 'inputType' | 'name' | 'plainText' | 'reference' | 'referencedObject' | 'richText' | 'slug' | 'translation' | 'value' | AttributeValueKeySpecifier)[];
 export type AttributeValueFieldPolicy = {
 	boolean?: FieldPolicy<any> | FieldReadFunction<any>,
 	date?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -686,6 +687,7 @@ export type AttributeValueFieldPolicy = {
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	plainText?: FieldPolicy<any> | FieldReadFunction<any>,
 	reference?: FieldPolicy<any> | FieldReadFunction<any>,
+	referencedObject?: FieldPolicy<any> | FieldReadFunction<any>,
 	richText?: FieldPolicy<any> | FieldReadFunction<any>,
 	slug?: FieldPolicy<any> | FieldReadFunction<any>,
 	translation?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -823,6 +825,15 @@ export type CalculateTaxesFieldPolicy = {
 	recipient?: FieldPolicy<any> | FieldReadFunction<any>,
 	taxBase?: FieldPolicy<any> | FieldReadFunction<any>,
 	version?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CardPaymentMethodDetailsKeySpecifier = ('brand' | 'expMonth' | 'expYear' | 'firstDigits' | 'lastDigits' | 'name' | CardPaymentMethodDetailsKeySpecifier)[];
+export type CardPaymentMethodDetailsFieldPolicy = {
+	brand?: FieldPolicy<any> | FieldReadFunction<any>,
+	expMonth?: FieldPolicy<any> | FieldReadFunction<any>,
+	expYear?: FieldPolicy<any> | FieldReadFunction<any>,
+	firstDigits?: FieldPolicy<any> | FieldReadFunction<any>,
+	lastDigits?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type CategoryKeySpecifier = ('ancestors' | 'backgroundImage' | 'children' | 'description' | 'descriptionJson' | 'id' | 'level' | 'metadata' | 'metafield' | 'metafields' | 'name' | 'parent' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'products' | 'seoDescription' | 'seoTitle' | 'slug' | 'translation' | 'updatedAt' | CategoryKeySpecifier)[];
 export type CategoryFieldPolicy = {
@@ -2064,6 +2075,10 @@ export type GatewayConfigLineKeySpecifier = ('field' | 'value' | GatewayConfigLi
 export type GatewayConfigLineFieldPolicy = {
 	field?: FieldPolicy<any> | FieldReadFunction<any>,
 	value?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type GenericPaymentMethodDetailsKeySpecifier = ('name' | GenericPaymentMethodDetailsKeySpecifier)[];
+export type GenericPaymentMethodDetailsFieldPolicy = {
+	name?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type GiftCardKeySpecifier = ('app' | 'boughtInChannel' | 'code' | 'created' | 'createdBy' | 'createdByEmail' | 'currentBalance' | 'displayCode' | 'endDate' | 'events' | 'expiryDate' | 'id' | 'initialBalance' | 'isActive' | 'last4CodeChars' | 'lastUsedOn' | 'metadata' | 'metafield' | 'metafields' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'product' | 'startDate' | 'tags' | 'usedBy' | 'usedByEmail' | 'user' | GiftCardKeySpecifier)[];
 export type GiftCardFieldPolicy = {
@@ -3610,6 +3625,10 @@ export type OrderVoidFieldPolicy = {
 	order?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type OtherPaymentMethodDetailsKeySpecifier = ('name' | OtherPaymentMethodDetailsKeySpecifier)[];
+export type OtherPaymentMethodDetailsFieldPolicy = {
+	name?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type PageKeySpecifier = ('attribute' | 'attributes' | 'content' | 'contentJson' | 'created' | 'id' | 'isPublished' | 'metadata' | 'metafield' | 'metafields' | 'pageType' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'publicationDate' | 'publishedAt' | 'seoDescription' | 'seoTitle' | 'slug' | 'title' | 'translation' | PageKeySpecifier)[];
 export type PageFieldPolicy = {
 	attribute?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4091,9 +4110,12 @@ export type PaymentRefundEventFieldPolicy = {
 	recipient?: FieldPolicy<any> | FieldReadFunction<any>,
 	version?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type PaymentSettingsKeySpecifier = ('defaultTransactionFlowStrategy' | PaymentSettingsKeySpecifier)[];
+export type PaymentSettingsKeySpecifier = ('checkoutReleaseFundsCutOffDate' | 'checkoutTtlBeforeReleasingFunds' | 'defaultTransactionFlowStrategy' | 'releaseFundsForExpiredCheckouts' | PaymentSettingsKeySpecifier)[];
 export type PaymentSettingsFieldPolicy = {
-	defaultTransactionFlowStrategy?: FieldPolicy<any> | FieldReadFunction<any>
+	checkoutReleaseFundsCutOffDate?: FieldPolicy<any> | FieldReadFunction<any>,
+	checkoutTtlBeforeReleasingFunds?: FieldPolicy<any> | FieldReadFunction<any>,
+	defaultTransactionFlowStrategy?: FieldPolicy<any> | FieldReadFunction<any>,
+	releaseFundsForExpiredCheckouts?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type PaymentSourceKeySpecifier = ('creditCardInfo' | 'gateway' | 'metadata' | 'paymentMethodId' | PaymentSourceKeySpecifier)[];
 export type PaymentSourceFieldPolicy = {
@@ -6333,7 +6355,7 @@ export type TransactionInitializeSessionFieldPolicy = {
 	transaction?: FieldPolicy<any> | FieldReadFunction<any>,
 	version?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type TransactionItemKeySpecifier = ('actions' | 'authorizePendingAmount' | 'authorizedAmount' | 'cancelPendingAmount' | 'canceledAmount' | 'chargePendingAmount' | 'chargedAmount' | 'checkout' | 'createdAt' | 'createdBy' | 'events' | 'externalUrl' | 'id' | 'message' | 'metadata' | 'metafield' | 'metafields' | 'modifiedAt' | 'name' | 'order' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'pspReference' | 'refundPendingAmount' | 'refundedAmount' | 'token' | TransactionItemKeySpecifier)[];
+export type TransactionItemKeySpecifier = ('actions' | 'authorizePendingAmount' | 'authorizedAmount' | 'cancelPendingAmount' | 'canceledAmount' | 'chargePendingAmount' | 'chargedAmount' | 'checkout' | 'createdAt' | 'createdBy' | 'events' | 'externalUrl' | 'id' | 'message' | 'metadata' | 'metafield' | 'metafields' | 'modifiedAt' | 'name' | 'order' | 'paymentMethodDetails' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'pspReference' | 'refundPendingAmount' | 'refundedAmount' | 'token' | TransactionItemKeySpecifier)[];
 export type TransactionItemFieldPolicy = {
 	actions?: FieldPolicy<any> | FieldReadFunction<any>,
 	authorizePendingAmount?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -6355,6 +6377,7 @@ export type TransactionItemFieldPolicy = {
 	modifiedAt?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	order?: FieldPolicy<any> | FieldReadFunction<any>,
+	paymentMethodDetails?: FieldPolicy<any> | FieldReadFunction<any>,
 	privateMetadata?: FieldPolicy<any> | FieldReadFunction<any>,
 	privateMetafield?: FieldPolicy<any> | FieldReadFunction<any>,
 	privateMetafields?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -7428,6 +7451,10 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | CalculateTaxesKeySpecifier | (() => undefined | CalculateTaxesKeySpecifier),
 		fields?: CalculateTaxesFieldPolicy,
 	},
+	CardPaymentMethodDetails?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CardPaymentMethodDetailsKeySpecifier | (() => undefined | CardPaymentMethodDetailsKeySpecifier),
+		fields?: CardPaymentMethodDetailsFieldPolicy,
+	},
 	Category?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | CategoryKeySpecifier | (() => undefined | CategoryKeySpecifier),
 		fields?: CategoryFieldPolicy,
@@ -8076,6 +8103,10 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | GatewayConfigLineKeySpecifier | (() => undefined | GatewayConfigLineKeySpecifier),
 		fields?: GatewayConfigLineFieldPolicy,
 	},
+	GenericPaymentMethodDetails?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | GenericPaymentMethodDetailsKeySpecifier | (() => undefined | GenericPaymentMethodDetailsKeySpecifier),
+		fields?: GenericPaymentMethodDetailsFieldPolicy,
+	},
 	GiftCard?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | GiftCardKeySpecifier | (() => undefined | GiftCardKeySpecifier),
 		fields?: GiftCardFieldPolicy,
@@ -8671,6 +8702,10 @@ export type StrictTypedTypePolicies = {
 	OrderVoid?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | OrderVoidKeySpecifier | (() => undefined | OrderVoidKeySpecifier),
 		fields?: OrderVoidFieldPolicy,
+	},
+	OtherPaymentMethodDetails?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OtherPaymentMethodDetailsKeySpecifier | (() => undefined | OtherPaymentMethodDetailsKeySpecifier),
+		fields?: OtherPaymentMethodDetailsFieldPolicy,
 	},
 	Page?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | PageKeySpecifier | (() => undefined | PageKeySpecifier),
