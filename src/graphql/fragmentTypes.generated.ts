@@ -335,6 +335,10 @@
       "Checkout",
       "Order"
     ],
+    "PaymentMethodDetails": [
+      "CardPaymentMethodDetails",
+      "OtherPaymentMethodDetails"
+    ],
     "PromotionEvent": [
       "PromotionCreatedEvent",
       "PromotionEndedEvent",
