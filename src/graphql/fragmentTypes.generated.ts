@@ -11,6 +11,28 @@
       "AppExtensionOptionsNewTab",
       "AppExtensionOptionsWidget"
     ],
+    "AssignedAttribute": [
+      "AssignedBooleanAttribute",
+      "AssignedDateAttribute",
+      "AssignedDateTimeAttribute",
+      "AssignedFileAttribute",
+      "AssignedMultiCategoryReferenceAttribute",
+      "AssignedMultiChoiceAttribute",
+      "AssignedMultiCollectionReferenceAttribute",
+      "AssignedMultiPageReferenceAttribute",
+      "AssignedMultiProductReferenceAttribute",
+      "AssignedMultiProductVariantReferenceAttribute",
+      "AssignedNumericAttribute",
+      "AssignedPlainTextAttribute",
+      "AssignedSingleCategoryReferenceAttribute",
+      "AssignedSingleChoiceAttribute",
+      "AssignedSingleCollectionReferenceAttribute",
+      "AssignedSinglePageReferenceAttribute",
+      "AssignedSingleProductReferenceAttribute",
+      "AssignedSingleProductVariantReferenceAttribute",
+      "AssignedSwatchAttribute",
+      "AssignedTextAttribute"
+    ],
     "CheckoutLineProblem": [
       "CheckoutLineProblemInsufficientStock",
       "CheckoutLineProblemVariantNotAvailable"
@@ -55,6 +77,7 @@
       "ChannelUpdated",
       "CheckoutCreated",
       "CheckoutFilterShippingMethods",
+      "CheckoutFullyAuthorized",
       "CheckoutFullyPaid",
       "CheckoutMetadataUpdated",
       "CheckoutUpdated",
@@ -334,6 +357,10 @@
     "OrderOrCheckout": [
       "Checkout",
       "Order"
+    ],
+    "PaymentMethodDetails": [
+      "CardPaymentMethodDetails",
+      "OtherPaymentMethodDetails"
     ],
     "PromotionEvent": [
       "PromotionCreatedEvent",
