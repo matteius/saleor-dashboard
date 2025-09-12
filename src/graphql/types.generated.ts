@@ -62,6 +62,12 @@ export type Scalars = {
    * Should be used in places where value must be nonnegative (0 or greater).
    */
   PositiveDecimal: any;
+  /**
+   * Positive Integer scalar implementation.
+   *
+   * Should be used in places where value must be positive (greater than 0).
+   */
+  PositiveInt: any;
   UUID: any;
   /** Variables of this type must be set to null in mutations. They will be replaced with a filename from a following multipart part containing a binary file. See: https://github.com/jaydenseric/graphql-multipart-request-spec. */
   Upload: any;
@@ -151,6 +157,12 @@ export type AccountRegisterInput = {
   password: Scalars['String'];
   /** Base of frontend URL that will be needed to create confirmation URL. Required when account confirmation is enabled. */
   redirectUrl?: InputMaybe<Scalars['String']>;
+};
+
+/** Filtering options for addresses. */
+export type AddressFilterInput = {
+  country?: InputMaybe<CountryCodeEnumFilterInput>;
+  phoneNumber?: InputMaybe<StringFilterInput>;
 };
 
 export type AddressInput = {
@@ -373,6 +385,41 @@ export enum AreaUnitsEnum {
   SQ_YD = 'SQ_YD'
 }
 
+export type AssignedAttributeReferenceInput = {
+  /** Returns objects with a reference pointing to a page identified by the given slug. */
+  pageSlugs?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to a product identified by the given slug. */
+  productSlugs?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to a product variant identified by the given sku. */
+  productVariantSkus?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to an object identified by the given ID. */
+  referencedIds?: InputMaybe<ContainsFilterInput>;
+};
+
+export type AssignedAttributeValueInput = {
+  /** Filter by boolean value for attributes of boolean type. */
+  boolean?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by date value for attributes of date type. */
+  date?: InputMaybe<DateRangeInput>;
+  /** Filter by date time value for attributes of date time type. */
+  dateTime?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by name assigned to AttributeValue. */
+  name?: InputMaybe<StringFilterInput>;
+  /** Filter by numeric value for attributes of numeric type. */
+  numeric?: InputMaybe<DecimalFilterInput>;
+  /** Filter by reference attribute value. */
+  reference?: InputMaybe<AssignedAttributeReferenceInput>;
+  /** Filter by slug assigned to AttributeValue. */
+  slug?: InputMaybe<StringFilterInput>;
+};
+
+export type AssignedAttributeWhereInput = {
+  /** Filter by attribute slug. */
+  slug?: InputMaybe<Scalars['String']>;
+  /** Filter by value of the attribute. Only one value input field is allowed. If provided more than one, the error will be raised. */
+  value?: InputMaybe<AssignedAttributeValueInput>;
+};
+
 export enum AttributeBulkCreateErrorCode {
   ALREADY_EXISTS = 'ALREADY_EXISTS',
   BLANK = 'BLANK',
@@ -470,6 +517,8 @@ export type AttributeCreateInput = {
 };
 
 export enum AttributeEntityTypeEnum {
+  CATEGORY = 'CATEGORY',
+  COLLECTION = 'COLLECTION',
   PAGE = 'PAGE',
   PRODUCT = 'PRODUCT',
   PRODUCT_VARIANT = 'PRODUCT_VARIANT'
@@ -510,23 +559,19 @@ export type AttributeFilterInput = {
 };
 
 export type AttributeInput = {
-  /** The boolean value of the attribute. */
+  /** The boolean value of the attribute. Requires `slug` to be provided. */
   boolean?: InputMaybe<Scalars['Boolean']>;
-  /** The date range that the returned values should be in. In case of date/time attributes, the UTC midnight of the given date is used. */
+  /** The date range that the returned values should be in. In case of date/time attributes, the UTC midnight of the given date is used. Requires `slug` to be provided. */
   date?: InputMaybe<DateRangeInput>;
-  /** The date/time range that the returned values should be in. */
+  /** The date/time range that the returned values should be in. Requires `slug` to be provided. */
   dateTime?: InputMaybe<DateTimeRangeInput>;
   /** Internal representation of an attribute name. */
-  slug: Scalars['String'];
-  /**
-   * Names corresponding to the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values.
-   *
-   * Added in Saleor 3.22.
-   */
-  valueNames?: InputMaybe<Array<Scalars['String']>>;
-  /** Slugs identifying the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values. */
+  slug?: InputMaybe<Scalars['String']>;
+  /** Filter by value of the attribute. Only one value input field is allowed. If provided more than one, the error will be raised. Cannot be combined with deprecated fields of `AttributeInput`. */
+  value?: InputMaybe<AssignedAttributeValueInput>;
+  /** Slugs identifying the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values. Requires `slug` to be provided. */
   values?: InputMaybe<Array<Scalars['String']>>;
-  /** The range that the returned values should be in. */
+  /** The range that the returned values should be in. Requires `slug` to be provided. */
   valuesRange?: InputMaybe<IntRangeInput>;
 };
 
@@ -541,6 +586,7 @@ export enum AttributeInputTypeEnum {
   PLAIN_TEXT = 'PLAIN_TEXT',
   REFERENCE = 'REFERENCE',
   RICH_TEXT = 'RICH_TEXT',
+  SINGLE_REFERENCE = 'SINGLE_REFERENCE',
   SWATCH = 'SWATCH'
 }
 
@@ -693,6 +739,12 @@ export type AttributeValueInput = {
   numeric?: InputMaybe<Scalars['String']>;
   /** Plain text content. */
   plainText?: InputMaybe<Scalars['String']>;
+  /**
+   * ID of the referenced entity for single reference attribute.
+   *
+   * Added in Saleor 3.22.
+   */
+  reference?: InputMaybe<Scalars['ID']>;
   /** List of entity IDs that will be used as references. */
   references?: InputMaybe<Array<Scalars['ID']>>;
   /** Text content in JSON format. */
@@ -759,6 +811,17 @@ export type AttributeValueUpdateInput = {
   value?: InputMaybe<Scalars['String']>;
 };
 
+/** Where filtering options for attribute values. */
+export type AttributeValueWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<AttributeValueWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<AttributeValueWhereInput>>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  name?: InputMaybe<StringFilterInput>;
+  slug?: InputMaybe<StringFilterInput>;
+};
+
 /** Where filtering options. */
 export type AttributeWhereInput = {
   /** List of conditions that must be met. */
@@ -804,6 +867,12 @@ export type BulkAttributeValueInput = {
   numeric?: InputMaybe<Scalars['String']>;
   /** Plain text content. */
   plainText?: InputMaybe<Scalars['String']>;
+  /**
+   * ID of the referenced entity for single reference attribute.
+   *
+   * Added in Saleor 3.22.
+   */
+  reference?: InputMaybe<Scalars['ID']>;
   /** List of entity IDs that will be used as references. */
   references?: InputMaybe<Array<Scalars['ID']>>;
   /** Text content in JSON format. */
@@ -821,6 +890,21 @@ export type CardInput = {
   cvc?: InputMaybe<Scalars['String']>;
   /** Information about currency and amount. */
   money: MoneyInput;
+};
+
+export type CardPaymentMethodDetailsInput = {
+  /** Brand of the payment method used for the transaction. Max length is 40 characters. */
+  brand?: InputMaybe<Scalars['String']>;
+  /** Expiration month of the card used for the transaction. Value must be between 1 and 12. */
+  expMonth?: InputMaybe<Scalars['Int']>;
+  /** Expiration year of the card used for the transaction. Value must be between 2000 and 9999. */
+  expYear?: InputMaybe<Scalars['Int']>;
+  /** First digits of the card used for the transaction. Max length is 4 characters. */
+  firstDigits?: InputMaybe<Scalars['String']>;
+  /** Last digits of the card used for the transaction. Max length is 4 characters. */
+  lastDigits?: InputMaybe<Scalars['String']>;
+  /** Name of the payment method used for the transaction. Max length is 256 characters. */
+  name: Scalars['String'];
 };
 
 export type CatalogueInput = {
@@ -1383,10 +1467,11 @@ export enum CollectionSortField {
    * Sort collections by publication date.
    *
    * This option requires a channel filter to work as the values can vary between channels.
+   * @deprecated Use `PUBLISHED_AT` instead.
    */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /**
-   * Sort collections by publication date.
+   * Sort collections by published at.
    *
    * This option requires a channel filter to work as the values can vary between channels.
    */
@@ -1427,6 +1512,14 @@ export enum ConfigurationTypeFieldEnum {
   SECRETMULTILINE = 'SECRETMULTILINE',
   STRING = 'STRING'
 }
+
+/** Define the filtering options for fields that can contain multiple values. */
+export type ContainsFilterInput = {
+  /** The field contains all of the specified values. */
+  containsAll?: InputMaybe<Array<Scalars['String']>>;
+  /** The field contains at least one of the specified values. */
+  containsAny?: InputMaybe<Array<Scalars['String']>>;
+};
 
 /**
  * Represents country codes defined by the ISO 3166-1 alpha-2 standard.
@@ -1679,12 +1772,23 @@ export enum CountryCode {
   VU = 'VU',
   WF = 'WF',
   WS = 'WS',
+  XK = 'XK',
   YE = 'YE',
   YT = 'YT',
   ZA = 'ZA',
   ZM = 'ZM',
   ZW = 'ZW'
 }
+
+/** Filter by country code. */
+export type CountryCodeEnumFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<CountryCode>;
+  /** The value not included in. */
+  notOneOf?: InputMaybe<Array<CountryCode>>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<CountryCode>>;
+};
 
 export type CountryFilterInput = {
   /** Boolean for filtering countries by having shipping zone assigned.If 'true', return countries with shipping zone assigned.If 'false', return countries without any shipping zone assigned.If the argument is not provided (null), return all countries. */
@@ -1787,6 +1891,34 @@ export type CustomerInput = {
    * Warning: never store sensitive information, including financial data such as credit card details.
    */
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
+};
+
+export type CustomerWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<CustomerWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<CustomerWhereInput>>;
+  /** Filter by addresses data associated with user. */
+  addresses?: InputMaybe<AddressFilterInput>;
+  /** Filter by date joined. */
+  dateJoined?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by email address. */
+  email?: InputMaybe<StringFilterInput>;
+  /** Filter by first name. */
+  firstName?: InputMaybe<StringFilterInput>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filter by whether the user is active. */
+  isActive?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by last name. */
+  lastName?: InputMaybe<StringFilterInput>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by number of orders placed by the user. */
+  numberOfOrders?: InputMaybe<IntFilterInput>;
+  /** Filter by date when orders were placed. */
+  placedOrdersAt?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by last updated date. */
+  updatedAt?: InputMaybe<DateTimeRangeInput>;
 };
 
 export type DateRangeInput = {
@@ -2060,6 +2192,54 @@ export type DraftOrderInput = {
   voucherCode?: InputMaybe<Scalars['String']>;
 };
 
+export type DraftOrderWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<DraftOrderWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<DraftOrderWhereInput>>;
+  /** Filter by authorize status. */
+  authorizeStatus?: InputMaybe<OrderAuthorizeStatusEnumFilterInput>;
+  /** Filter by billing address of the order. */
+  billingAddress?: InputMaybe<AddressFilterInput>;
+  /** Filter by channel. */
+  channelId?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by charge status. */
+  chargeStatus?: InputMaybe<OrderChargeStatusEnumFilterInput>;
+  /** Filter order by created at date. */
+  createdAt?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by order events. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  events?: InputMaybe<Array<OrderEventFilterInput>>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filter by whether the order uses the click and collect delivery method. */
+  isClickAndCollect?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by line items associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  lines?: InputMaybe<Array<LinesFilterInput>>;
+  /** Filter by number of lines in the order. */
+  linesCount?: InputMaybe<IntFilterInput>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by order number. */
+  number?: InputMaybe<IntFilterInput>;
+  /** Filter by the product type of related order lines. */
+  productTypeId?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by shipping address of the order. */
+  shippingAddress?: InputMaybe<AddressFilterInput>;
+  /** Filter by total gross amount of the order. */
+  totalGross?: InputMaybe<PriceFilterInput>;
+  /** Filter by total net amount of the order. */
+  totalNet?: InputMaybe<PriceFilterInput>;
+  /** Filter by transaction data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  transactions?: InputMaybe<Array<TransactionFilterInput>>;
+  /** Filter order by updated at date. */
+  updatedAt?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by user. */
+  user?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by user email. */
+  userEmail?: InputMaybe<StringFilterInput>;
+  /** Filter by voucher code used in the order. */
+  voucherCode?: InputMaybe<StringFilterInput>;
+};
+
 export enum ErrorPolicyEnum {
   /** Save what is possible within a single row. If there are errors in an input data row, try to save it partially and skip the invalid part. */
   IGNORE_FAILED = 'IGNORE_FAILED',
@@ -2132,6 +2312,7 @@ export enum ExportFileSortField {
   CREATED_AT = 'CREATED_AT',
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   STATUS = 'STATUS',
+  /** @deprecated Use `LAST_MODIFIED_AT` instead. */
   UPDATED_AT = 'UPDATED_AT'
 }
 
@@ -2221,10 +2402,14 @@ export type FulfillmentCancelInput = {
   warehouseId?: InputMaybe<Scalars['ID']>;
 };
 
-/** Filter input for fulfillments. */
+/** Filter input for order fulfillments data. */
 export type FulfillmentFilterInput = {
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
   /** Filter by fulfillment status. */
   status?: InputMaybe<FulfillmentStatusEnumFilterInput>;
+  /** Filter by fulfillment warehouse. */
+  warehouse?: InputMaybe<FulfillmentWarehouseFilterInput>;
 };
 
 export enum FulfillmentStatus {
@@ -2250,6 +2435,16 @@ export type FulfillmentUpdateTrackingInput = {
   notifyCustomer?: InputMaybe<Scalars['Boolean']>;
   /** Fulfillment tracking number. */
   trackingNumber?: InputMaybe<Scalars['String']>;
+};
+
+/** Filter input for fulfillment warehouses. */
+export type FulfillmentWarehouseFilterInput = {
+  /** Filter fulfillments by warehouse external reference. */
+  externalReference?: InputMaybe<StringFilterInput>;
+  /** Filter fulfillments by warehouse ID. */
+  id?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter fulfillments by warehouse slug. */
+  slug?: InputMaybe<StringFilterInput>;
 };
 
 export type GiftCardAddNoteInput = {
@@ -3295,6 +3490,12 @@ export enum LanguageCodeEnum {
   ZU_ZA = 'ZU_ZA'
 }
 
+/** Filter input for order lines data. */
+export type LinesFilterInput = {
+  /** Filter by metadata fields of order lines. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+};
+
 /**
  * Determine the mark as paid strategy for the channel.
  *
@@ -3494,11 +3695,37 @@ export type MetadataFilter = {
   value?: InputMaybe<Scalars['String']>;
 };
 
+/**
+ * Allows filtering based on metadata key/value pairs.
+ *
+ *         Examples:
+ *         - `{key: "size"}`
+ *           Matches objects where the metadata key "size" exists, regardless of its value.
+ *         - `{key: "color", value: {oneOf: ["blue", "green"]}}`
+ *           Matches objects where the metadata key "color" is set to either "blue" or "green".
+ *         - `{key: "status", value: {eq: "active"}}`
+ *           Matches objects where the metadata key "status" is set to "active".
+ */
+export type MetadataFilterInput = {
+  /** Key to filter by. If not other fields provided - checking the existence of the key in metadata. */
+  key: Scalars['String'];
+  /** Value to filter by. */
+  value?: InputMaybe<MetadataValueFilterInput>;
+};
+
 export type MetadataInput = {
   /** Key of a metadata item. */
   key: Scalars['String'];
   /** Value of a metadata item. */
   value: Scalars['String'];
+};
+
+/** Define the filtering options for metadata value fields. */
+export type MetadataValueFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<Scalars['String']>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<Scalars['String']>>;
 };
 
 export type MoneyInput = {
@@ -3963,6 +4190,21 @@ export enum OrderErrorCode {
   ZERO_QUANTITY = 'ZERO_QUANTITY'
 }
 
+/** Filter input for order events data. */
+export type OrderEventFilterInput = {
+  /** Filter order events by date. */
+  date?: InputMaybe<DateTimeRangeInput>;
+  /** Filter order events by type. */
+  type?: InputMaybe<OrderEventTypeEnumFilterInput>;
+};
+
+export type OrderEventTypeEnumFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<OrderEventsEnum>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<OrderEventsEnum>>;
+};
+
 export enum OrderEventsEmailsEnum {
   CONFIRMED = 'CONFIRMED',
   DIGITAL_LINKS = 'DIGITAL_LINKS',
@@ -4342,20 +4584,32 @@ export type OrderSettingsUpdateInput = {
 export enum OrderSortField {
   /** Sort orders by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort orders by creation date. */
+  /**
+   * Sort orders by creation date
+   * @deprecated Use `CREATED_AT` instead.
+   */
   CREATION_DATE = 'CREATION_DATE',
   /** Sort orders by customer. */
   CUSTOMER = 'CUSTOMER',
-  /** Sort orders by fulfillment status. */
+  /**
+   * Sort orders by fulfillment status.
+   * @deprecated Use `STATUS` instead.
+   */
   FULFILLMENT_STATUS = 'FULFILLMENT_STATUS',
-  /** Sort orders by last modified at. */
+  /** Sort orders by last modified date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort orders by number. */
   NUMBER = 'NUMBER',
-  /** Sort orders by payment. */
+  /** Sort orders by payment status. */
   PAYMENT = 'PAYMENT',
   /** Sort orders by rank. Note: This option is available only with the `search` filter. */
-  RANK = 'RANK'
+  RANK = 'RANK',
+  /**
+   * Sort orders by order status.
+   *
+   * Added in Saleor 3.22.
+   */
+  STATUS = 'STATUS'
 }
 
 export type OrderSortingInput = {
@@ -4440,6 +4694,8 @@ export type OrderWhereInput = {
   OR?: InputMaybe<Array<OrderWhereInput>>;
   /** Filter by authorize status. */
   authorizeStatus?: InputMaybe<OrderAuthorizeStatusEnumFilterInput>;
+  /** Filter by billing address of the order. */
+  billingAddress?: InputMaybe<AddressFilterInput>;
   /** Filter by channel. */
   channelId?: InputMaybe<GlobalIdFilterInput>;
   /** Filter by charge status. */
@@ -4450,33 +4706,43 @@ export type OrderWhereInput = {
   checkoutToken?: InputMaybe<UuidFilterInput>;
   /** Filter order by created at date. */
   createdAt?: InputMaybe<DateTimeRangeInput>;
-  /** Filter by fulfillment data associated with the order. */
-  fulfillments?: InputMaybe<FulfillmentFilterInput>;
+  /** Filter by order events. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  events?: InputMaybe<Array<OrderEventFilterInput>>;
+  /** Filter by fulfillment data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  fulfillments?: InputMaybe<Array<FulfillmentFilterInput>>;
   /** Filter by whether the order has any fulfillments. */
   hasFulfillments?: InputMaybe<Scalars['Boolean']>;
   /** Filter by whether the order has any invoices. */
   hasInvoices?: InputMaybe<Scalars['Boolean']>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
-  /** Filter by invoice data associated with the order. */
-  invoices?: InputMaybe<InvoiceFilterInput>;
+  /** Filter by invoice data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  invoices?: InputMaybe<Array<InvoiceFilterInput>>;
   /** Filter by whether the order uses the click and collect delivery method. */
   isClickAndCollect?: InputMaybe<Scalars['Boolean']>;
   /** Filter based on whether the order includes a gift card purchase. */
   isGiftCardBought?: InputMaybe<Scalars['Boolean']>;
   /** Filter based on whether a gift card was used in the order. */
   isGiftCardUsed?: InputMaybe<Scalars['Boolean']>;
-  /** Filter by whether the order contains preorder items. */
-  isPreorder?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by line items associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  lines?: InputMaybe<Array<LinesFilterInput>>;
   /** Filter by number of lines in the order. */
   linesCount?: InputMaybe<IntFilterInput>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
   /** Filter by order number. */
   number?: InputMaybe<IntFilterInput>;
+  /** Filter by the product type of related order lines. */
+  productTypeId?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by shipping address of the order. */
+  shippingAddress?: InputMaybe<AddressFilterInput>;
   /** Filter by order status. */
   status?: InputMaybe<OrderStatusEnumFilterInput>;
   /** Filter by total gross amount of the order. */
   totalGross?: InputMaybe<PriceFilterInput>;
   /** Filter by total net amount of the order. */
   totalNet?: InputMaybe<PriceFilterInput>;
+  /** Filter by transaction data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  transactions?: InputMaybe<Array<TransactionFilterInput>>;
   /** Filter order by updated at date. */
   updatedAt?: InputMaybe<DateTimeRangeInput>;
   /** Filter by user. */
@@ -4485,6 +4751,11 @@ export type OrderWhereInput = {
   userEmail?: InputMaybe<StringFilterInput>;
   /** Filter by voucher code used in the order. */
   voucherCode?: InputMaybe<StringFilterInput>;
+};
+
+export type OtherPaymentMethodDetailsInput = {
+  /** Name of the payment method used for the transaction. */
+  name: Scalars['String'];
 };
 
 export type PageCreateInput = {
@@ -4556,9 +4827,15 @@ export type PageInput = {
 export enum PageSortField {
   /** Sort pages by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort pages by creation date. */
+  /**
+   * Sort pages by creation date.
+   * @deprecated Use `CREATED_AT` instead.
+   */
   CREATION_DATE = 'CREATION_DATE',
-  /** Sort pages by publication date. */
+  /**
+   * Sort pages by publication date.
+   * @deprecated Use `PUBLISHED_AT` instead.
+   */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /** Sort pages by publication date. */
   PUBLISHED_AT = 'PUBLISHED_AT',
@@ -4629,6 +4906,22 @@ export type PageTypeUpdateInput = {
   slug?: InputMaybe<Scalars['String']>;
 };
 
+export type PageWhereInput = {
+  /** List of conditions that must be met. */
+  AND?: InputMaybe<Array<PageWhereInput>>;
+  /** A list of conditions of which at least one must be met. */
+  OR?: InputMaybe<Array<PageWhereInput>>;
+  /** Filter by attributes associated with the page. */
+  attributes?: InputMaybe<Array<AssignedAttributeWhereInput>>;
+  ids?: InputMaybe<Array<Scalars['ID']>>;
+  /** Filter by metadata fields. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by page type. */
+  pageType?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter by page slug. */
+  slug?: InputMaybe<StringFilterInput>;
+};
+
 export enum PaymentChargeStatusEnum {
   CANCELLED = 'CANCELLED',
   FULLY_CHARGED = 'FULLY_CHARGED',
@@ -4657,6 +4950,7 @@ export enum PaymentErrorCode {
   CHANNEL_INACTIVE = 'CHANNEL_INACTIVE',
   CHECKOUT_COMPLETION_IN_PROGRESS = 'CHECKOUT_COMPLETION_IN_PROGRESS',
   CHECKOUT_EMAIL_NOT_SET = 'CHECKOUT_EMAIL_NOT_SET',
+  CHECKOUT_HAS_TRANSACTION = 'CHECKOUT_HAS_TRANSACTION',
   GRAPHQL_ERROR = 'GRAPHQL_ERROR',
   INVALID = 'INVALID',
   INVALID_SHIPPING_METHOD = 'INVALID_SHIPPING_METHOD',
@@ -4738,6 +5032,30 @@ export type PaymentInput = {
   token?: InputMaybe<Scalars['String']>;
 };
 
+export type PaymentMethodDetailsCardFilterInput = {
+  /** Filter by payment method brand used to pay for the order. */
+  brand?: InputMaybe<StringFilterInput>;
+};
+
+export type PaymentMethodDetailsFilterInput = {
+  /** Filter by card details used to pay for the order. Skips `type` filter if provided. */
+  card?: InputMaybe<PaymentMethodDetailsCardFilterInput>;
+  /** Filter by payment method type used to pay for the order. */
+  type?: InputMaybe<PaymentMethodTypeEnumFilterInput>;
+};
+
+/**
+ * Details of the payment method used for the transaction. One of `card` or `other` is required.
+ *
+ * Added in Saleor 3.22.
+ */
+export type PaymentMethodDetailsInput = {
+  /** Details of the card payment method used for the transaction. */
+  card?: InputMaybe<CardPaymentMethodDetailsInput>;
+  /** Details of the non-card payment method used for this transaction. */
+  other?: InputMaybe<OtherPaymentMethodDetailsInput>;
+};
+
 export enum PaymentMethodInitializeTokenizationErrorCode {
   CHANNEL_INACTIVE = 'CHANNEL_INACTIVE',
   GATEWAY_ERROR = 'GATEWAY_ERROR',
@@ -4772,9 +5090,46 @@ export enum PaymentMethodTokenizationResult {
   SUCCESSFULLY_TOKENIZED = 'SUCCESSFULLY_TOKENIZED'
 }
 
+/**
+ * Represents possible payment method types.
+ *
+ *     The following types are possible:
+ *     CARD - represents a card payment method.
+ *     OTHER - represents any payment method that is not a card payment.
+ */
+export enum PaymentMethodTypeEnum {
+  CARD = 'CARD',
+  OTHER = 'OTHER'
+}
+
+export type PaymentMethodTypeEnumFilterInput = {
+  /** The value equal to. */
+  eq?: InputMaybe<PaymentMethodTypeEnum>;
+  /** The value included in. */
+  oneOf?: InputMaybe<Array<PaymentMethodTypeEnum>>;
+};
+
 export type PaymentSettingsInput = {
+  /**
+   * Specifies the earliest date on which funds for expired checkouts can begin to be released. Expired checkouts dated before this cut-off will not have their funds released. Additionally, no funds will be released for checkouts that are more than one year old, regardless of the cut-off date.
+   *
+   * Added in Saleor 3.20.
+   */
+  checkoutReleaseFundsCutOffDate?: InputMaybe<Scalars['DateTime']>;
+  /**
+   * The time in hours after which funds for expired checkouts will be released.
+   *
+   * Added in Saleor 3.20.
+   */
+  checkoutTtlBeforeReleasingFunds?: InputMaybe<Scalars['Hour']>;
   /** Determine the transaction flow strategy to be used. Include the selected option in the payload sent to the payment app, as a requested action for the transaction. */
   defaultTransactionFlowStrategy?: InputMaybe<TransactionFlowStrategyEnum>;
+  /**
+   * Determine if the funds for expired checkouts should be released automatically.
+   *
+   * Added in Saleor 3.20.
+   */
+  releaseFundsForExpiredCheckouts?: InputMaybe<Scalars['Boolean']>;
 };
 
 export enum PermissionEnum {
@@ -5299,9 +5654,15 @@ export enum ProductOrderField {
   COLLECTION = 'COLLECTION',
   /** Sort products by creation date. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort products by update date. */
+  /**
+   * Sort products by update date.
+   * @deprecated Use `LAST_MODIFIED_AT` instead.
+   */
   DATE = 'DATE',
-  /** Sort products by update date. */
+  /**
+   * Sort products by update date.
+   * @deprecated Use `LAST_MODIFIED_AT` instead.
+   */
   LAST_MODIFIED = 'LAST_MODIFIED',
   /** Sort products by update date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
@@ -5323,6 +5684,7 @@ export enum ProductOrderField {
    * Sort products by publication date.
    *
    * This option requires a channel filter to work as the values can vary between channels.
+   * @deprecated Use `PUBLISHED_AT` instead.
    */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
   /**
@@ -5624,7 +5986,7 @@ export type ProductVariantInput = {
 };
 
 export enum ProductVariantSortField {
-  /** Sort products variants by last modified at. */
+  /** Sort product variants by last modification date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
 }
 
@@ -5656,8 +6018,18 @@ export type ProductVariantWhereInput = {
   AND?: InputMaybe<Array<ProductVariantWhereInput>>;
   /** A list of conditions of which at least one must be met. */
   OR?: InputMaybe<Array<ProductVariantWhereInput>>;
+  /**
+   * Filter by attributes associated with the variant.
+   *
+   * Added in Saleor 3.22.
+   */
+  attributes?: InputMaybe<Array<AssignedAttributeWhereInput>>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
   metadata?: InputMaybe<Array<MetadataFilter>>;
+  /** Filter by product SKU. */
+  sku?: InputMaybe<StringFilterInput>;
+  /** Filter by when was the most recent update. */
+  updatedAt?: InputMaybe<DateTimeRangeInput>;
 };
 
 export type ProductWhereInput = {
@@ -5925,7 +6297,7 @@ export type PromotionRuleUpdateInput = {
 };
 
 export enum PromotionSortField {
-  /** Sort promotions by created at. */
+  /** Sort promotions by creation date. */
   CREATED_AT = 'CREATED_AT',
   /** Sort promotions by end date. */
   END_DATE = 'END_DATE',
@@ -6076,11 +6448,11 @@ export type SaleInput = {
 };
 
 export enum SaleSortField {
-  /** Sort sales by created at. */
+  /** Sort sales by creation date. */
   CREATED_AT = 'CREATED_AT',
   /** Sort sales by end date. */
   END_DATE = 'END_DATE',
-  /** Sort sales by last modified at. */
+  /** Sort sales by last modification date. */
   LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort sales by name. */
   NAME = 'NAME',
@@ -6757,6 +7129,12 @@ export type TransactionCreateInput = {
   /** Payment name of the transaction. */
   name?: InputMaybe<Scalars['String']>;
   /**
+   * Details of the payment method used for the transaction.
+   *
+   * Added in Saleor 3.22.
+   */
+  paymentMethodDetails?: InputMaybe<PaymentMethodDetailsInput>;
+  /**
    * Payment private metadata. Requires permissions to modify and to read the metadata of the object it's attached to.
    *
    * Warning: never store sensitive information, including financial data such as credit card details.
@@ -6829,6 +7207,14 @@ export enum TransactionEventTypeEnum {
   REFUND_REVERSE = 'REFUND_REVERSE',
   REFUND_SUCCESS = 'REFUND_SUCCESS'
 }
+
+/** Filter input for transactions. */
+export type TransactionFilterInput = {
+  /** Filter by metadata fields of transactions. */
+  metadata?: InputMaybe<MetadataFilterInput>;
+  /** Filter by payment method details used to pay for the order. */
+  paymentMethodDetails?: InputMaybe<PaymentMethodDetailsFilterInput>;
+};
 
 /**
  * Determine the transaction flow strategy.
@@ -6921,6 +7307,12 @@ export type TransactionUpdateInput = {
   metadata?: InputMaybe<Array<MetadataInput>>;
   /** Payment name of the transaction. */
   name?: InputMaybe<Scalars['String']>;
+  /**
+   * Details of the payment method used for the transaction.
+   *
+   * Added in Saleor 3.22.
+   */
+  paymentMethodDetails?: InputMaybe<PaymentMethodDetailsInput>;
   /**
    * Payment private metadata. Requires permissions to modify and to read the metadata of the object it's attached to.
    *
@@ -7174,7 +7566,10 @@ export type VoucherInput = {
 };
 
 export enum VoucherSortField {
-  /** Sort vouchers by code. */
+  /**
+   * Sort vouchers by code.
+   * @deprecated Field no longer supported
+   */
   CODE = 'CODE',
   /** Sort vouchers by end date. */
   END_DATE = 'END_DATE',
@@ -7403,6 +7798,17 @@ export enum WebhookEventTypeAsyncEnum {
   CHANNEL_UPDATED = 'CHANNEL_UPDATED',
   /** A new checkout is created. */
   CHECKOUT_CREATED = 'CHECKOUT_CREATED',
+  /**
+   * A checkout was fully authorized (its `authorizeStatus` is `FULL`).
+   *
+   * This event is emitted only for checkouts whose payments are processed through the Transaction API.
+   */
+  CHECKOUT_FULLY_AUTHORIZED = 'CHECKOUT_FULLY_AUTHORIZED',
+  /**
+   * A checkout was fully paid (its `chargeStatus` is `FULL` or `OVERCHARGED`). This event is not sent if payments are only authorized but not fully charged.
+   *
+   * This event is emitted only for checkouts whose payments are processed through the Transaction API.
+   */
   CHECKOUT_FULLY_PAID = 'CHECKOUT_FULLY_PAID',
   /** A checkout metadata is updated. */
   CHECKOUT_METADATA_UPDATED = 'CHECKOUT_METADATA_UPDATED',
@@ -7701,6 +8107,17 @@ export enum WebhookEventTypeEnum {
   CHECKOUT_CREATED = 'CHECKOUT_CREATED',
   /** Filter shipping methods for checkout. */
   CHECKOUT_FILTER_SHIPPING_METHODS = 'CHECKOUT_FILTER_SHIPPING_METHODS',
+  /**
+   * A checkout was fully authorized (its `authorizeStatus` is `FULL`).
+   *
+   * This event is emitted only for checkouts whose payments are processed through the Transaction API.
+   */
+  CHECKOUT_FULLY_AUTHORIZED = 'CHECKOUT_FULLY_AUTHORIZED',
+  /**
+   * A checkout was fully paid (its `chargeStatus` is `FULL` or `OVERCHARGED`). This event is not sent if payments are only authorized but not fully charged.
+   *
+   * This event is emitted only for checkouts whose payments are processed through the Transaction API.
+   */
   CHECKOUT_FULLY_PAID = 'CHECKOUT_FULLY_PAID',
   /** A checkout metadata is updated. */
   CHECKOUT_METADATA_UPDATED = 'CHECKOUT_METADATA_UPDATED',
@@ -8036,6 +8453,7 @@ export enum WebhookSampleEventTypeEnum {
   CHANNEL_STATUS_CHANGED = 'CHANNEL_STATUS_CHANGED',
   CHANNEL_UPDATED = 'CHANNEL_UPDATED',
   CHECKOUT_CREATED = 'CHECKOUT_CREATED',
+  CHECKOUT_FULLY_AUTHORIZED = 'CHECKOUT_FULLY_AUTHORIZED',
   CHECKOUT_FULLY_PAID = 'CHECKOUT_FULLY_PAID',
   CHECKOUT_METADATA_UPDATED = 'CHECKOUT_METADATA_UPDATED',
   CHECKOUT_UPDATED = 'CHECKOUT_UPDATED',
