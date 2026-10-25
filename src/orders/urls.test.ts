@@ -121,6 +121,20 @@ describe("Order URLs", () => {
         "/orders?0[s2.status][0]=UNFULFILLED&0[s2.status][1]=PARTIALLY_FULFILLED",
       );
     });
+
+    it("should AND the status filter with a channel filter", () => {
+      // Arrange
+      const channel = { id: "Q2hhbm5lbDox", name: "Channel-USD", slug: "channel-usd" };
+
+      // Act
+      const result = decodeURIComponent(
+        orderListUrlWithStatuses([OrderStatus.UNCONFIRMED], channel),
+      );
+
+      // Assert
+      expect(result).toMatch(/^\/orders\?0\[s2\.status\]\[0\]=UNCONFIRMED&1=AND&2\[/);
+      expect(result).toContain("channel-usd");
+    });
   });
 });
 

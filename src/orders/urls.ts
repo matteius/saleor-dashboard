@@ -197,14 +197,10 @@ export const orderListUrlWithChannel = (
 };
 
 /**
- * Builds the order list URL pre-filtered by order status ("in" multiselect).
+ * Creates an order status filter element ("in" multiselect).
  * Status values double as their slugs, matching `EnumValuesHandler`.
  */
-export const orderListUrlWithStatuses = (statuses: OrderStatus[]): string => {
-  if (statuses.length === 0) {
-    return orderListPath;
-  }
-
+const createStatusesFilterElement = (statuses: OrderStatus[]): FilterElement => {
   const expressionValue = new ExpressionValue("status", "Order Status", "status");
   const conditionOptions = ConditionOptions.fromStaticElementName("status");
   const conditionItem: ConditionItem = { type: "multiselect", label: "in", value: "input-2" };
@@ -213,9 +209,36 @@ export const orderListUrlWithStatuses = (statuses: OrderStatus[]): string => {
     statuses.map(status => ({ label: status, value: status, slug: status })),
   );
   const condition = new Condition(conditionOptions, conditionSelected, false);
-  const queryParams = prepareStructure([new FilterElement(expressionValue, condition, false)]);
 
-  return urlJoin(orderListPath, "?" + stringify(queryParams));
+  return new FilterElement(expressionValue, condition, false);
+};
+
+/**
+ * Builds the order list URL pre-filtered by order status and, optionally, a single channel.
+ */
+export const orderListUrlWithStatuses = (
+  statuses: OrderStatus[],
+  channel?: Pick<ChannelFragment, "id" | "name" | "slug">,
+): string => {
+  const filterContainer: Array<FilterElement | "AND"> = [];
+
+  if (statuses.length > 0) {
+    filterContainer.push(createStatusesFilterElement(statuses));
+  }
+
+  if (channel) {
+    if (filterContainer.length > 0) {
+      filterContainer.push("AND");
+    }
+
+    filterContainer.push(createChannelsFilterElement(channel));
+  }
+
+  if (filterContainer.length === 0) {
+    return orderListPath;
+  }
+
+  return urlJoin(orderListPath, "?" + stringify(prepareStructure(filterContainer)));
 };
 
 export const orderDraftListPath = urlJoin(orderSectionUrl, "drafts");

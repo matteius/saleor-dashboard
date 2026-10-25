@@ -1,11 +1,43 @@
-import { OrderStatus } from "@dashboard/graphql";
+import { AllocationStrategyEnum, type ChannelFragment, OrderStatus } from "@dashboard/graphql";
 import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router-dom";
 
 import { StoreHomeView, type StoreHomeViewProps } from "./StoreHome";
 
+const channels: ChannelFragment[] = [
+  {
+    __typename: "Channel",
+    id: "Q2hhbm5lbDox",
+    name: "Online store",
+    slug: "default-channel",
+    isActive: true,
+    currencyCode: "USD",
+    defaultCountry: { __typename: "CountryDisplay", code: "US", country: "United States" },
+    stockSettings: {
+      __typename: "StockSettings",
+      allocationStrategy: AllocationStrategyEnum.PRIORITIZE_HIGH_STOCK,
+    },
+  },
+  {
+    __typename: "Channel",
+    id: "Q2hhbm5lbDoy",
+    name: "Coin shows",
+    slug: "coin-shows",
+    isActive: true,
+    currencyCode: "USD",
+    defaultCountry: { __typename: "CountryDisplay", code: "US", country: "United States" },
+    stockSettings: {
+      __typename: "StockSettings",
+      allocationStrategy: AllocationStrategyEnum.PRIORITIZE_HIGH_STOCK,
+    },
+  },
+];
+
 const baseProps: StoreHomeViewProps = {
   firstName: "Matt",
+  channel: channels[0],
+  channels,
+  onChannelSelect: () => undefined,
   loading: false,
   hasError: false,
   canManageOrders: true,

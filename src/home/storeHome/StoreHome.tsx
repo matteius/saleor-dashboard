@@ -1,5 +1,7 @@
 import { hasPermission } from "@dashboard/auth/misc";
 import { useUser } from "@dashboard/auth/useUser";
+import useAppChannel from "@dashboard/components/AppLayout/AppChannelContext";
+import AppChannelSelect from "@dashboard/components/AppLayout/AppChannelSelect";
 import { AssignableListCard } from "@dashboard/components/AssignableListTable/AssignableListCard";
 import {
   AssignableListCell,
@@ -14,6 +16,7 @@ import { Pill } from "@dashboard/components/Pill/Pill";
 import { customerListUrl } from "@dashboard/customers/urls";
 import { discountListUrl } from "@dashboard/discounts/discountsUrls";
 import {
+  type ChannelFragment,
   type HomeStoreOverviewQuery,
   OrderStatus,
   PermissionEnum,
@@ -22,7 +25,7 @@ import {
 import { transformOrderStatus } from "@dashboard/misc";
 import {
   orderDraftListUrl,
-  orderListUrl,
+  orderListUrlWithChannel,
   orderListUrlWithStatuses,
   orderUrl,
 } from "@dashboard/orders/urls";
@@ -56,6 +59,9 @@ export interface StoreHomeSales {
 
 export interface StoreHomeViewProps {
   firstName?: string | null;
+  channel?: ChannelFragment;
+  channels: ChannelFragment[];
+  onChannelSelect: (id: string) => void;
   loading: boolean;
   hasError: boolean;
   canManageOrders: boolean;
@@ -157,6 +163,9 @@ const quickLinkIcon = { size: iconSize.medium, strokeWidth: iconStrokeWidthBySiz
 
 export const StoreHomeView = ({
   firstName,
+  channel,
+  channels,
+  onChannelSelect,
   loading,
   hasError,
   canManageOrders,
@@ -178,13 +187,22 @@ export const StoreHomeView = ({
       gap={6}
       data-test-id="store-home"
     >
-      <Box display="flex" flexDirection="column" gap={1}>
-        <Text as="h1" size={8} fontWeight="bold">
-          <FormattedMessage {...messages.greeting} values={{ name: firstName || "empty" }} />
-        </Text>
-        <Text size={3} color="default2">
-          <FormattedMessage {...messages.subtitle} />
-        </Text>
+      <Box display="flex" alignItems="flex-start" justifyContent="space-between" gap={4}>
+        <Box display="flex" flexDirection="column" gap={1}>
+          <Text as="h1" size={8} fontWeight="bold">
+            <FormattedMessage {...messages.greeting} values={{ name: firstName || "empty" }} />
+          </Text>
+          <Text size={3} color="default2">
+            <FormattedMessage {...messages.subtitle} />
+          </Text>
+        </Box>
+        {channel && channels.length > 1 ? (
+          <AppChannelSelect
+            channels={channels}
+            selectedChannelId={channel.id}
+            onChannelSelect={onChannelSelect}
+          />
+        ) : null}
       </Box>
 
       {hasError ? (
@@ -198,7 +216,7 @@ export const StoreHomeView = ({
           <>
             <StatTile
               label={<FormattedMessage {...messages.toFulfill} />}
-              href={orderListUrlWithStatuses(TO_FULFILL_STATUSES)}
+              href={orderListUrlWithStatuses(TO_FULFILL_STATUSES, channel)}
               attention={!!toFulfillCount}
               testId="store-home-to-fulfill"
             >
@@ -206,7 +224,7 @@ export const StoreHomeView = ({
             </StatTile>
             <StatTile
               label={<FormattedMessage {...messages.unconfirmed} />}
-              href={orderListUrlWithStatuses([OrderStatus.UNCONFIRMED])}
+              href={orderListUrlWithStatuses([OrderStatus.UNCONFIRMED], channel)}
               attention={!!unconfirmedCount}
               testId="store-home-unconfirmed"
             >
@@ -258,7 +276,7 @@ export const StoreHomeView = ({
             data-test-id="store-home-recent-orders"
             title={<FormattedMessage {...messages.recentOrders} />}
             headerEnd={
-              <Link to={orderListUrl()}>
+              <Link to={orderListUrlWithChannel(channel)}>
                 <Button variant="secondary">
                   <FormattedMessage {...messages.viewAllOrders} />
                 </Button>
@@ -373,16 +391,22 @@ export const StoreHome = (): React.ReactNode => {
   const { user } = useUser();
   const canManageOrders = !!user && !!hasPermission(PermissionEnum.MANAGE_ORDERS, user);
   const canManageProducts = !!user && !!hasPermission(PermissionEnum.MANAGE_PRODUCTS, user);
+  // Stock availability is per channel, and Saleor rejects the products query without one
+  // once the store has several channels, so the whole overview follows the selected channel.
+  const { channel, setChannel } = useAppChannel(false);
+  const channels = user?.accessibleChannels ?? [];
   // Fixed per mount so the query variables (and Apollo cache key) stay stable.
   const since = useMemo(() => startOfDayDaysAgo(SALES_WINDOW_DAYS - 1), []);
 
   const { data, loading, error } = useHomeStoreOverviewQuery({
     variables: {
+      channel: channel?.slug ?? "",
+      channelId: channel?.id ?? "",
       since,
       hasManageOrders: canManageOrders,
       hasManageProducts: canManageProducts,
     },
-    skip: !canManageOrders && !canManageProducts,
+    skip: !channel || (!canManageOrders && !canManageProducts),
     fetchPolicy: "cache-and-network",
   });
 
@@ -403,6 +427,9 @@ export const StoreHome = (): React.ReactNode => {
   return (
     <StoreHomeView
       firstName={user?.firstName}
+      channel={channel}
+      channels={channels}
+      onChannelSelect={setChannel}
       loading={loading && !data}
       hasError={!!error && !data}
       canManageOrders={canManageOrders}

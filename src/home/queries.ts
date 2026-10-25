@@ -2,20 +2,28 @@ import { gql } from "@apollo/client";
 
 export const homeStoreOverview = gql`
   query HomeStoreOverview(
+    $channel: String!
+    $channelId: ID!
     $since: DateTime!
     $hasManageOrders: Boolean!
     $hasManageProducts: Boolean!
   ) {
-    toFulfill: orders(where: { status: { oneOf: [UNFULFILLED, PARTIALLY_FULFILLED] } })
-      @include(if: $hasManageOrders) {
+    toFulfill: orders(
+      where: {
+        channelId: { eq: $channelId }
+        status: { oneOf: [UNFULFILLED, PARTIALLY_FULFILLED] }
+      }
+    ) @include(if: $hasManageOrders) {
       totalCount
     }
-    unconfirmed: orders(where: { status: { eq: UNCONFIRMED } }) @include(if: $hasManageOrders) {
+    unconfirmed: orders(where: { channelId: { eq: $channelId }, status: { eq: UNCONFIRMED } })
+      @include(if: $hasManageOrders) {
       totalCount
     }
     recentSales: orders(
       first: 100
       where: {
+        channelId: { eq: $channelId }
         createdAt: { gte: $since }
         status: { oneOf: [UNFULFILLED, PARTIALLY_FULFILLED, FULFILLED, PARTIALLY_RETURNED] }
       }
@@ -36,8 +44,11 @@ export const homeStoreOverview = gql`
         }
       }
     }
-    recentOrders: orders(first: 10, sortBy: { field: CREATED_AT, direction: DESC })
-      @include(if: $hasManageOrders) {
+    recentOrders: orders(
+      first: 10
+      sortBy: { field: CREATED_AT, direction: DESC }
+      where: { channelId: { eq: $channelId } }
+    ) @include(if: $hasManageOrders) {
       edges {
         node {
           id
@@ -59,7 +70,7 @@ export const homeStoreOverview = gql`
         }
       }
     }
-    outOfStock: products(where: { stockAvailability: OUT_OF_STOCK })
+    outOfStock: products(channel: $channel, where: { stockAvailability: OUT_OF_STOCK })
       @include(if: $hasManageProducts) {
       totalCount
     }

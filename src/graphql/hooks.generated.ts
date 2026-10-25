@@ -13212,16 +13212,20 @@ export type CustomerGiftCardListQueryHookResult = ReturnType<typeof useCustomerG
 export type CustomerGiftCardListLazyQueryHookResult = ReturnType<typeof useCustomerGiftCardListLazyQuery>;
 export type CustomerGiftCardListQueryResult = Apollo.QueryResult<Types.CustomerGiftCardListQuery, Types.CustomerGiftCardListQueryVariables>;
 export const HomeStoreOverviewDocument = gql`
-    query HomeStoreOverview($since: DateTime!, $hasManageOrders: Boolean!, $hasManageProducts: Boolean!) {
-  toFulfill: orders(where: {status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED]}}) @include(if: $hasManageOrders) {
+    query HomeStoreOverview($channel: String!, $channelId: ID!, $since: DateTime!, $hasManageOrders: Boolean!, $hasManageProducts: Boolean!) {
+  toFulfill: orders(
+    where: {channelId: {eq: $channelId}, status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED]}}
+  ) @include(if: $hasManageOrders) {
     totalCount
   }
-  unconfirmed: orders(where: {status: {eq: UNCONFIRMED}}) @include(if: $hasManageOrders) {
+  unconfirmed: orders(
+    where: {channelId: {eq: $channelId}, status: {eq: UNCONFIRMED}}
+  ) @include(if: $hasManageOrders) {
     totalCount
   }
   recentSales: orders(
     first: 100
-    where: {createdAt: {gte: $since}, status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED, FULFILLED, PARTIALLY_RETURNED]}}
+    where: {channelId: {eq: $channelId}, createdAt: {gte: $since}, status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED, FULFILLED, PARTIALLY_RETURNED]}}
   ) @include(if: $hasManageOrders) {
     totalCount
     pageInfo {
@@ -13239,7 +13243,11 @@ export const HomeStoreOverviewDocument = gql`
       }
     }
   }
-  recentOrders: orders(first: 10, sortBy: {field: CREATED_AT, direction: DESC}) @include(if: $hasManageOrders) {
+  recentOrders: orders(
+    first: 10
+    sortBy: {field: CREATED_AT, direction: DESC}
+    where: {channelId: {eq: $channelId}}
+  ) @include(if: $hasManageOrders) {
     edges {
       node {
         id
@@ -13261,7 +13269,10 @@ export const HomeStoreOverviewDocument = gql`
       }
     }
   }
-  outOfStock: products(where: {stockAvailability: OUT_OF_STOCK}) @include(if: $hasManageProducts) {
+  outOfStock: products(
+    channel: $channel
+    where: {stockAvailability: OUT_OF_STOCK}
+  ) @include(if: $hasManageProducts) {
     totalCount
   }
 }
@@ -13279,6 +13290,8 @@ export const HomeStoreOverviewDocument = gql`
  * @example
  * const { data, loading, error } = useHomeStoreOverviewQuery({
  *   variables: {
+ *      channel: // value for 'channel'
+ *      channelId: // value for 'channelId'
  *      since: // value for 'since'
  *      hasManageOrders: // value for 'hasManageOrders'
  *      hasManageProducts: // value for 'hasManageProducts'

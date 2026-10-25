@@ -12948,6 +12948,8 @@ export type CustomerGiftCardListQueryVariables = Exact<{
 export type CustomerGiftCardListQuery = { __typename: 'Query', user: { __typename: 'User', id: string, giftCards: { __typename: 'GiftCardCountableConnection', edges: Array<{ __typename: 'GiftCardCountableEdge', node: { __typename: 'GiftCard', id: string, last4CodeChars: string, expiryDate: string | null, isActive: boolean, currentBalance: { __typename: 'Money', amount: number, currency: string } } }> } | null } | null };
 
 export type HomeStoreOverviewQueryVariables = Exact<{
+  channel: Scalars['String']['input'];
+  channelId: Scalars['ID']['input'];
   since: Scalars['DateTime']['input'];
   hasManageOrders: Scalars['Boolean']['input'];
   hasManageProducts: Scalars['Boolean']['input'];
