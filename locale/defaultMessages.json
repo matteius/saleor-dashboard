@@ -413,6 +413,10 @@
     "context": "Fallback text shown when a product media image fails to load",
     "string": "Image could not be loaded"
   },
+  "/W6IDH": {
+    "context": "store home stat tile",
+    "string": "Unconfirmed orders"
+  },
   "/WXs6H": {
     "context": "collection name",
     "string": "Name"
@@ -566,6 +570,10 @@
   "06bR4Z": {
     "context": "order history message",
     "string": "Order cancel information was sent to customer"
+  },
+  "07+pGX": {
+    "context": "store home recent orders column",
+    "string": "Customer"
   },
   "076tw7": {
     "context": "widget preference: visibility button when shown",
@@ -768,6 +776,10 @@
     "context": "section header",
     "string": "Refunded Amount"
   },
+  "0q4oAK": {
+    "context": "store home recent orders column",
+    "string": "Order"
+  },
   "0qg33z": {
     "context": "table column header",
     "string": "Return"
@@ -885,6 +897,10 @@
   "1J/bhZ": {
     "context": "expiry date section header",
     "string": "Expiry date"
+  },
+  "1Km7Y2": {
+    "context": "store home quick links card title",
+    "string": "Quick actions"
   },
   "1LCFJM": {
     "context": "settings search hint when deep links are not yet available",
@@ -1680,6 +1696,10 @@
   },
   "4bNRr4": {
     "string": "Reason note"
+  },
+  "4c371d": {
+    "context": "store home quick link",
+    "string": "Draft orders"
   },
   "4fJ17F": {
     "context": "Charge in progress transaction amount, data display header",
@@ -2555,6 +2575,10 @@
     "context": "select title",
     "string": "Select channels you want for {contentType} to be available on"
   },
+  "7vUpmW": {
+    "context": "store home query error",
+    "string": "Couldn't load store overview. Try refreshing the page."
+  },
   "7vnKNE": {
     "context": "structure item name",
     "string": "Name"
@@ -2768,6 +2792,10 @@
   },
   "8oIbMI": {
     "string": "Reached limit for this plan"
+  },
+  "8od4Gv": {
+    "context": "store home greeting",
+    "string": "Welcome back{name, select, empty {} other {, {name}}}"
   },
   "8p8zxN": {
     "context": "customer account is active",
@@ -3018,6 +3046,10 @@
   "9ZJLIE": {
     "context": "intro to list of consequences of blocking storefront traffic",
     "string": "Turning this off blocks storefronts from reaching the API on their own:"
+  },
+  "9ZW8sg": {
+    "context": "store home stat tile",
+    "string": "Sales, last 7 days"
   },
   "9Zlogd": {
     "context": "staff member status",
@@ -4319,6 +4351,10 @@
   "Ed2705": {
     "string": "Create new model type"
   },
+  "EfDa7w": {
+    "context": "store home recent orders column",
+    "string": "Total"
+  },
   "EfF28c": {
     "context": "channel inventory reorder hint",
     "string": "Drag the handles to reorder."
@@ -5411,6 +5447,10 @@
     "context": "staff notification description",
     "string": "Sent when a staff member requests a password reset."
   },
+  "IIXH/V": {
+    "context": "store home quick link",
+    "string": "Add a product"
+  },
   "IKvOK+": {
     "context": "Amount error message",
     "string": "Amount must be bigger than 0"
@@ -6019,6 +6059,10 @@
     "context": "staff list column showing whether staff user has placed orders",
     "string": "Customer"
   },
+  "KpNx7i": {
+    "context": "store home recent orders column",
+    "string": "Date"
+  },
   "KpP/aW": {
     "string": "Order was marked as"
   },
@@ -6292,6 +6336,10 @@
     "context": "metadata field value, header",
     "string": "Value"
   },
+  "Ll4ULh": {
+    "context": "store home quick link",
+    "string": "Discounts"
+  },
   "LlbAEg": {
     "context": "order history message",
     "string": "External service notification"
@@ -6346,6 +6394,10 @@
   "LxGbUN": {
     "context": "tax strategy status for flat rates",
     "string": "Flat rates"
+  },
+  "LzS0cG": {
+    "context": "store home quick link",
+    "string": "Customers"
   },
   "M/xjya": {
     "context": "voucher scope tile title",
@@ -6845,6 +6897,10 @@
   "Nqh0na": {
     "context": "Product types search input placeholder",
     "string": "Search product types..."
+  },
+  "Nrv3Fp": {
+    "context": "store home sales tile empty value",
+    "string": "No sales yet"
   },
   "Nsbu46": {
     "context": "Placeholder for channel search input",
@@ -7546,6 +7602,10 @@
   },
   "QOm7+P": {
     "string": "Create new order"
+  },
+  "QP+Rzj": {
+    "context": "store home stat tile",
+    "string": "Orders to fulfill"
   },
   "QQdTUC": {
     "context": "order header date, less than a minute ago",
@@ -11657,6 +11717,10 @@
     "context": "count of installed payment apps",
     "string": "{count} installed"
   },
+  "fzbl8z": {
+    "context": "store home recent orders card title",
+    "string": "Recent orders"
+  },
   "fzk04H": {
     "context": "dialog title",
     "string": "Delete image"
@@ -12296,6 +12360,10 @@
   "iQkrjy": {
     "string": "Shipping zone name"
   },
+  "iRBCd7": {
+    "context": "store home recent orders column",
+    "string": "Status"
+  },
   "iRui6c": {
     "context": "channel catalog unpublished action description",
     "string": "Added to this channel but publish is still off."
@@ -12459,6 +12527,10 @@
   },
   "ixjvkM": {
     "string": "We’ve created your default token. Make sure to copy your new personal access token now. You won’t be able to see it again."
+  },
+  "izzYX/": {
+    "context": "store home sales tile caption",
+    "string": "{count, plural, one {# order} other {# orders}}"
   },
   "j+lQWT": {
     "context": "error message when cut-off date is older than 30 days",
@@ -12967,6 +13039,10 @@
   "kXqn6A": {
     "context": "table header column",
     "string": "Charge taxes"
+  },
+  "ka1+II": {
+    "context": "store home stat tile",
+    "string": "Products out of stock"
   },
   "kak5vT": {
     "context": "order refund amount",
@@ -14257,6 +14333,10 @@
   "pEf/m+": {
     "string": "There are no previews at the moment. Stay tuned!"
   },
+  "pEvzET": {
+    "context": "store home sales tile caption when more than 100 orders",
+    "string": "{count, plural, one {# order} other {# orders}} · total covers latest 100"
+  },
   "pFVX6g": {
     "string": "Variant with these attributes already exists"
   },
@@ -14918,6 +14998,10 @@
     "context": "Status label when object is unpublished in a channel",
     "string": "Unpublished"
   },
+  "rJiiGw": {
+    "context": "store home recent orders empty state",
+    "string": "No orders yet"
+  },
   "rKf4LU": {
     "context": "dialog title",
     "string": "Delete attributes"
@@ -15370,6 +15454,10 @@
   "szm4zm": {
     "context": "setup task CTA",
     "string": "Create warehouse"
+  },
+  "t+i0fy": {
+    "context": "store home button",
+    "string": "View all orders"
   },
   "t/R8nK": {
     "context": "ShippingZoneSettingsCard title",
@@ -16704,6 +16792,10 @@
   "xOFbeR": {
     "context": "toast after creating attribute values",
     "string": "{count, plural, one {Added new value} other {Added # values}}"
+  },
+  "xOOuyD": {
+    "context": "store home subtitle",
+    "string": "Here's what needs your attention today."
   },
   "xOrtMG": {
     "context": "Availability card hint when channel listings are dirty",

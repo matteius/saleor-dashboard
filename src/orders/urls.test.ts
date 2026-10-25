@@ -1,9 +1,12 @@
+import { OrderStatus } from "@dashboard/graphql";
+
 import {
   orderListPath,
   orderListUrl,
   orderListUrlWithChannel,
   orderListUrlWithCustomerEmail,
   orderListUrlWithCustomerId,
+  orderListUrlWithStatuses,
   withOrderFulfillmentDialog,
 } from "./urls";
 
@@ -93,6 +96,30 @@ describe("Order URLs", () => {
       expect(result).toContain("/orders?");
       expect(result).toContain("channel");
       expect(result).toContain("channel-usd");
+    });
+  });
+
+  describe("orderListUrlWithStatuses", () => {
+    it("should return orderListPath when no statuses are given", () => {
+      // Arrange
+      // Act
+      const result = orderListUrlWithStatuses([]);
+
+      // Assert
+      expect(result).toBe(orderListPath);
+    });
+
+    it("should build URL with a status multiselect filter", () => {
+      // Arrange
+      const statuses = [OrderStatus.UNFULFILLED, OrderStatus.PARTIALLY_FULFILLED];
+
+      // Act
+      const result = decodeURIComponent(orderListUrlWithStatuses(statuses));
+
+      // Assert
+      expect(result).toBe(
+        "/orders?0[s2.status][0]=UNFULFILLED&0[s2.status][1]=PARTIALLY_FULFILLED",
+      );
     });
   });
 });

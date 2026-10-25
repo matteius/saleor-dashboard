@@ -12947,6 +12947,15 @@ export type CustomerGiftCardListQueryVariables = Exact<{
 
 export type CustomerGiftCardListQuery = { __typename: 'Query', user: { __typename: 'User', id: string, giftCards: { __typename: 'GiftCardCountableConnection', edges: Array<{ __typename: 'GiftCardCountableEdge', node: { __typename: 'GiftCard', id: string, last4CodeChars: string, expiryDate: string | null, isActive: boolean, currentBalance: { __typename: 'Money', amount: number, currency: string } } }> } | null } | null };
 
+export type HomeStoreOverviewQueryVariables = Exact<{
+  since: Scalars['DateTime']['input'];
+  hasManageOrders: Scalars['Boolean']['input'];
+  hasManageProducts: Scalars['Boolean']['input'];
+}>;
+
+
+export type HomeStoreOverviewQuery = { __typename: 'Query', toFulfill?: { __typename: 'OrderCountableConnection', totalCount: number | null } | null, unconfirmed?: { __typename: 'OrderCountableConnection', totalCount: number | null } | null, recentSales?: { __typename: 'OrderCountableConnection', totalCount: number | null, pageInfo: { __typename: 'PageInfo', hasNextPage: boolean }, edges: Array<{ __typename: 'OrderCountableEdge', node: { __typename: 'Order', id: string, total: { __typename: 'TaxedMoney', gross: { __typename: 'Money', amount: number, currency: string } } } }> } | null, recentOrders?: { __typename: 'OrderCountableConnection', edges: Array<{ __typename: 'OrderCountableEdge', node: { __typename: 'Order', id: string, number: string, created: any, status: OrderStatus, userEmail: string | null, billingAddress: { __typename: 'Address', id: string, firstName: string, lastName: string } | null, total: { __typename: 'TaxedMoney', gross: { __typename: 'Money', amount: number, currency: string } } } }> } | null, outOfStock?: { __typename: 'ProductCountableConnection', totalCount: number | null } | null };
+
 export type PageTypeUpdateMutationVariables = Exact<{
   id: Scalars['ID']['input'];
   input: PageTypeUpdateInput;

@@ -28,6 +28,10 @@ jest.mock("./HomeWidgetView", () => ({
   ),
 }));
 
+jest.mock("./storeHome/StoreHome", () => ({
+  StoreHome: () => <div data-test-id="store-home" />,
+}));
+
 jest.mock("./HomeWidgetsGrid", () => ({
   HomeWidgetsGrid: () => <div data-test-id="home-widgets-grid" />,
 }));
@@ -142,7 +146,7 @@ describe("HomePage states", () => {
     mockGetPreferenceState.mockImplementation(() => "default");
   });
 
-  it("renders neither Pulse promo nor tabs while loading", () => {
+  it("renders neither store overview nor tabs while loading", () => {
     // Arrange
     useExtensionsWithLoadingStateMock.mockReturnValue({
       extensions: { HOMEPAGE_WIDGETS: [] },
@@ -154,12 +158,11 @@ describe("HomePage states", () => {
 
     // Assert
     expect(screen.getByTestId("home-extensions-loading")).toBeInTheDocument();
-    expect(screen.queryByText("See how your store is doing")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("store-home")).not.toBeInTheDocument();
     expect(screen.queryByTestId("home-widgets-grid")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("home-pulse-cta")).not.toBeInTheDocument();
   });
 
-  it("renders the Pulse empty state when loaded with no extensions", () => {
+  it("renders the store overview when loaded with no extensions", () => {
     // Arrange
     useExtensionsWithLoadingStateMock.mockReturnValue({
       extensions: { HOMEPAGE_WIDGETS: [] },
@@ -170,12 +173,8 @@ describe("HomePage states", () => {
     renderHomePage();
 
     // Assert
-    expect(screen.getByText("See how your store is doing")).toBeInTheDocument();
-    expect(screen.getByTestId("home-pulse-cta")).toBeInTheDocument();
-    expect(screen.getByTestId("home-create-own-homepage-link")).toHaveAttribute(
-      "href",
-      expect.stringContaining("extending-dashboard-with-apps"),
-    );
+    expect(screen.getByTestId("store-home")).toBeInTheDocument();
+    expect(screen.queryByTestId("home-widgets-grid")).not.toBeInTheDocument();
   });
 
   it("keeps visited Home iframes mounted when /home redirects to the leftmost tab", () => {

@@ -13211,6 +13211,91 @@ export function useCustomerGiftCardListLazyQuery(baseOptions?: ApolloReactHooks.
 export type CustomerGiftCardListQueryHookResult = ReturnType<typeof useCustomerGiftCardListQuery>;
 export type CustomerGiftCardListLazyQueryHookResult = ReturnType<typeof useCustomerGiftCardListLazyQuery>;
 export type CustomerGiftCardListQueryResult = Apollo.QueryResult<Types.CustomerGiftCardListQuery, Types.CustomerGiftCardListQueryVariables>;
+export const HomeStoreOverviewDocument = gql`
+    query HomeStoreOverview($since: DateTime!, $hasManageOrders: Boolean!, $hasManageProducts: Boolean!) {
+  toFulfill: orders(where: {status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED]}}) @include(if: $hasManageOrders) {
+    totalCount
+  }
+  unconfirmed: orders(where: {status: {eq: UNCONFIRMED}}) @include(if: $hasManageOrders) {
+    totalCount
+  }
+  recentSales: orders(
+    first: 100
+    where: {createdAt: {gte: $since}, status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED, FULFILLED, PARTIALLY_RETURNED]}}
+  ) @include(if: $hasManageOrders) {
+    totalCount
+    pageInfo {
+      hasNextPage
+    }
+    edges {
+      node {
+        id
+        total {
+          gross {
+            amount
+            currency
+          }
+        }
+      }
+    }
+  }
+  recentOrders: orders(first: 10, sortBy: {field: CREATED_AT, direction: DESC}) @include(if: $hasManageOrders) {
+    edges {
+      node {
+        id
+        number
+        created
+        status
+        userEmail
+        billingAddress {
+          id
+          firstName
+          lastName
+        }
+        total {
+          gross {
+            amount
+            currency
+          }
+        }
+      }
+    }
+  }
+  outOfStock: products(where: {stockAvailability: OUT_OF_STOCK}) @include(if: $hasManageProducts) {
+    totalCount
+  }
+}
+    `;
+
+/**
+ * __useHomeStoreOverviewQuery__
+ *
+ * To run a query within a React component, call `useHomeStoreOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHomeStoreOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHomeStoreOverviewQuery({
+ *   variables: {
+ *      since: // value for 'since'
+ *      hasManageOrders: // value for 'hasManageOrders'
+ *      hasManageProducts: // value for 'hasManageProducts'
+ *   },
+ * });
+ */
+export function useHomeStoreOverviewQuery(baseOptions: ApolloReactHooks.QueryHookOptions<Types.HomeStoreOverviewQuery, Types.HomeStoreOverviewQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<Types.HomeStoreOverviewQuery, Types.HomeStoreOverviewQueryVariables>(HomeStoreOverviewDocument, options);
+      }
+export function useHomeStoreOverviewLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<Types.HomeStoreOverviewQuery, Types.HomeStoreOverviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<Types.HomeStoreOverviewQuery, Types.HomeStoreOverviewQueryVariables>(HomeStoreOverviewDocument, options);
+        }
+export type HomeStoreOverviewQueryHookResult = ReturnType<typeof useHomeStoreOverviewQuery>;
+export type HomeStoreOverviewLazyQueryHookResult = ReturnType<typeof useHomeStoreOverviewLazyQuery>;
+export type HomeStoreOverviewQueryResult = Apollo.QueryResult<Types.HomeStoreOverviewQuery, Types.HomeStoreOverviewQueryVariables>;
 export const PageTypeUpdateDocument = gql`
     mutation PageTypeUpdate($id: ID!, $input: PageTypeUpdateInput!) {
   pageTypeUpdate(id: $id, input: $input) {

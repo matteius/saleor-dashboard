@@ -7,9 +7,9 @@ import { useParams, useRouteMatch } from "react-router";
 import { Redirect } from "react-router-dom";
 
 import { filterHomeExtensions, HOMEPAGE_WIDGETS_MOUNT } from "./filterHomeExtensions";
-import { HomeEmptyState } from "./HomeEmptyState";
 import { HomeTabPanels } from "./HomeTabPanels";
 import { type HomeActiveTab } from "./HomeWidgetTabs";
+import { StoreHome } from "./storeHome/StoreHome";
 import { homeWidgetsUrl, homeWidgetUrl } from "./urls";
 
 export const useHomeRouteParams = () => {
@@ -100,19 +100,19 @@ export const HomePage = () => {
   const widgets = applyExtensionPreferences(split.widgets, getState);
 
   if (loading) {
-    // No live data yet and no non-empty snapshot: stay blank so the Pulse
-    // empty state never appears as a loading placeholder.
+    // No live data yet and no non-empty snapshot: stay blank so the store
+    // overview never flashes before an extension tab takes over.
     return <Box height="100%" data-test-id="home-extensions-loading" />;
   }
 
   if (fullscreen.length === 0 && widgets.length === 0) {
-    return <HomeEmptyState />;
+    return <StoreHome />;
   }
 
   const leftmostUrl = resolveLeftmostTabUrl(fullscreen, widgets);
 
   if (!leftmostUrl) {
-    return <HomeEmptyState />;
+    return <StoreHome />;
   }
 
   const { activeTab, redirectTo } = resolveHomeTab({

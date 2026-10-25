@@ -196,6 +196,28 @@ export const orderListUrlWithChannel = (
   return urlJoin(orderListPath, "?" + stringify(queryParams));
 };
 
+/**
+ * Builds the order list URL pre-filtered by order status ("in" multiselect).
+ * Status values double as their slugs, matching `EnumValuesHandler`.
+ */
+export const orderListUrlWithStatuses = (statuses: OrderStatus[]): string => {
+  if (statuses.length === 0) {
+    return orderListPath;
+  }
+
+  const expressionValue = new ExpressionValue("status", "Order Status", "status");
+  const conditionOptions = ConditionOptions.fromStaticElementName("status");
+  const conditionItem: ConditionItem = { type: "multiselect", label: "in", value: "input-2" };
+  const conditionSelected = ConditionSelected.fromConditionItemAndValue(
+    conditionItem,
+    statuses.map(status => ({ label: status, value: status, slug: status })),
+  );
+  const condition = new Condition(conditionOptions, conditionSelected, false);
+  const queryParams = prepareStructure([new FilterElement(expressionValue, condition, false)]);
+
+  return urlJoin(orderListPath, "?" + stringify(queryParams));
+};
+
 export const orderDraftListPath = urlJoin(orderSectionUrl, "drafts");
 export enum OrderDraftListUrlFiltersEnum {
   createdFrom = "createdFrom",
