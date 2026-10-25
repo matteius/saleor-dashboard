@@ -13212,7 +13212,7 @@ export type CustomerGiftCardListQueryHookResult = ReturnType<typeof useCustomerG
 export type CustomerGiftCardListLazyQueryHookResult = ReturnType<typeof useCustomerGiftCardListLazyQuery>;
 export type CustomerGiftCardListQueryResult = Apollo.QueryResult<Types.CustomerGiftCardListQuery, Types.CustomerGiftCardListQueryVariables>;
 export const HomeStoreOverviewDocument = gql`
-    query HomeStoreOverview($channel: String!, $channelId: ID!, $since: DateTime!, $hasManageOrders: Boolean!, $hasManageProducts: Boolean!) {
+    query HomeStoreOverview($channel: String!, $channelId: ID!, $since: DateTime!, $cartsSince: Date!, $hasManageOrders: Boolean!, $hasManageProducts: Boolean!, $hasManageCheckouts: Boolean!) {
   toFulfill: orders(
     where: {channelId: {eq: $channelId}, status: {oneOf: [UNFULFILLED, PARTIALLY_FULFILLED]}}
   ) @include(if: $hasManageOrders) {
@@ -13275,6 +13275,43 @@ export const HomeStoreOverviewDocument = gql`
   ) @include(if: $hasManageProducts) {
     totalCount
   }
+  openCarts: checkouts(
+    first: 50
+    sortBy: {field: CREATION_DATE, direction: DESC}
+    filter: {channels: [$channelId], updatedAt: {gte: $cartsSince}}
+  ) @include(if: $hasManageCheckouts) {
+    edges {
+      node {
+        id
+        updatedAt
+        email
+        quantity
+        billingAddress {
+          id
+          firstName
+          lastName
+        }
+        lines {
+          id
+          quantity
+          variant {
+            id
+            name
+            product {
+              id
+              name
+            }
+          }
+        }
+        totalPrice {
+          gross {
+            amount
+            currency
+          }
+        }
+      }
+    }
+  }
 }
     `;
 
@@ -13293,8 +13330,10 @@ export const HomeStoreOverviewDocument = gql`
  *      channel: // value for 'channel'
  *      channelId: // value for 'channelId'
  *      since: // value for 'since'
+ *      cartsSince: // value for 'cartsSince'
  *      hasManageOrders: // value for 'hasManageOrders'
  *      hasManageProducts: // value for 'hasManageProducts'
+ *      hasManageCheckouts: // value for 'hasManageCheckouts'
  *   },
  * });
  */

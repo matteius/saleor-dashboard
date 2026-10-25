@@ -5,8 +5,10 @@ export const homeStoreOverview = gql`
     $channel: String!
     $channelId: ID!
     $since: DateTime!
+    $cartsSince: Date!
     $hasManageOrders: Boolean!
     $hasManageProducts: Boolean!
+    $hasManageCheckouts: Boolean!
   ) {
     toFulfill: orders(
       where: {
@@ -73,6 +75,43 @@ export const homeStoreOverview = gql`
     outOfStock: products(channel: $channel, where: { stockAvailability: OUT_OF_STOCK })
       @include(if: $hasManageProducts) {
       totalCount
+    }
+    openCarts: checkouts(
+      first: 50
+      sortBy: { field: CREATION_DATE, direction: DESC }
+      filter: { channels: [$channelId], updatedAt: { gte: $cartsSince } }
+    ) @include(if: $hasManageCheckouts) {
+      edges {
+        node {
+          id
+          updatedAt
+          email
+          quantity
+          billingAddress {
+            id
+            firstName
+            lastName
+          }
+          lines {
+            id
+            quantity
+            variant {
+              id
+              name
+              product {
+                id
+                name
+              }
+            }
+          }
+          totalPrice {
+            gross {
+              amount
+              currency
+            }
+          }
+        }
+      }
     }
   }
 `;

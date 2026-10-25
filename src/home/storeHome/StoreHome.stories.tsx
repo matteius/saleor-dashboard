@@ -42,6 +42,7 @@ const baseProps: StoreHomeViewProps = {
   hasError: false,
   canManageOrders: true,
   canManageProducts: true,
+  canManageCheckouts: true,
   toFulfillCount: 3,
   unconfirmedCount: 0,
   outOfStockCount: 12,
@@ -83,6 +84,69 @@ const baseProps: StoreHomeViewProps = {
       },
     },
   ],
+  openCarts: [
+    {
+      __typename: "Checkout",
+      id: "Q2hlY2tvdXQ6MQ==",
+      updatedAt: "2026-10-25T07:55:00Z",
+      email: "numismatist@example.com",
+      quantity: 3,
+      billingAddress: null,
+      lines: [
+        {
+          __typename: "CheckoutLine",
+          id: "Q2hlY2tvdXRMaW5lOjE=",
+          quantity: 1,
+          variant: {
+            __typename: "ProductVariant",
+            id: "UHJvZHVjdFZhcmlhbnQ6MQ==",
+            name: "",
+            product: { __typename: "Product", id: "UHJvZHVjdDox", name: "1909-S VDB Lincoln Cent" },
+          },
+        },
+        {
+          __typename: "CheckoutLine",
+          id: "Q2hlY2tvdXRMaW5lOjI=",
+          quantity: 2,
+          variant: {
+            __typename: "ProductVariant",
+            id: "UHJvZHVjdFZhcmlhbnQ6Mg==",
+            name: "",
+            product: { __typename: "Product", id: "UHJvZHVjdDoy", name: "1921 Morgan Dollar" },
+          },
+        },
+      ],
+      totalPrice: {
+        __typename: "TaxedMoney",
+        gross: { __typename: "Money", amount: 1189, currency: "USD" },
+      },
+    },
+    {
+      __typename: "Checkout",
+      id: "Q2hlY2tvdXQ6Mg==",
+      updatedAt: "2026-10-23T21:10:00Z",
+      email: null,
+      quantity: 1,
+      billingAddress: null,
+      lines: [
+        {
+          __typename: "CheckoutLine",
+          id: "Q2hlY2tvdXRMaW5lOjM=",
+          quantity: 1,
+          variant: {
+            __typename: "ProductVariant",
+            id: "UHJvZHVjdFZhcmlhbnQ6Mw==",
+            name: "",
+            product: { __typename: "Product", id: "UHJvZHVjdDoz", name: "1916-D Mercury Dime" },
+          },
+        },
+      ],
+      totalPrice: {
+        __typename: "TaxedMoney",
+        gross: { __typename: "Money", amount: 2150, currency: "USD" },
+      },
+    },
+  ],
 };
 
 const meta: Meta<typeof StoreHomeView> = {
@@ -110,7 +174,7 @@ type Story = StoryObj<typeof StoreHomeView>;
 export const Default: Story = {};
 
 export const Loading: Story = {
-  args: { loading: true, recentOrders: undefined, sales: undefined },
+  args: { loading: true, recentOrders: undefined, sales: undefined, openCarts: undefined },
 };
 
 export const Empty: Story = {
@@ -120,6 +184,7 @@ export const Empty: Story = {
     outOfStockCount: 0,
     sales: { totals: [], orderCount: 0, truncated: false },
     recentOrders: [],
+    openCarts: [],
   },
 };
 

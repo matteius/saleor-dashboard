@@ -29,22 +29,32 @@ import {
   orderListUrlWithStatuses,
   orderUrl,
 } from "@dashboard/orders/urls";
-import { productListUrl } from "@dashboard/products/urls";
+import { productListUrl, productUrl } from "@dashboard/products/urls";
 import { type RelayToFlat } from "@dashboard/types";
 import { type IMoney } from "@dashboard/utils/intl";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { Box, Button, Skeleton, Text } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
-import { ChevronRight, FileText, PackagePlus, Percent, ShoppingCart, Users } from "lucide-react";
+import {
+  ChevronRight,
+  FileText,
+  PackagePlus,
+  Percent,
+  ShoppingBasket,
+  ShoppingCart,
+  Users,
+} from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "react-router-dom";
 
 import { messages } from "./messages";
+import { localDateDaysAgo, type OpenCart, selectOpenCarts } from "./openCarts";
 import styles from "./StoreHome.module.css";
 import { startOfDayDaysAgo, sumByCurrency } from "./sumByCurrency";
 
 const SALES_WINDOW_DAYS = 7;
+const OPEN_CARTS_WINDOW_DAYS = 3;
 const TO_FULFILL_STATUSES = [OrderStatus.UNFULFILLED, OrderStatus.PARTIALLY_FULFILLED];
 
 type RecentOrder = NonNullable<
@@ -66,11 +76,13 @@ export interface StoreHomeViewProps {
   hasError: boolean;
   canManageOrders: boolean;
   canManageProducts: boolean;
+  canManageCheckouts: boolean;
   toFulfillCount?: number | null;
   unconfirmedCount?: number | null;
   outOfStockCount?: number | null;
   sales?: StoreHomeSales;
   recentOrders?: RecentOrder[];
+  openCarts?: OpenCart[];
 }
 
 const StatValue = ({
@@ -137,6 +149,130 @@ const customerLabel = (order: RecentOrder): string => {
   return name || order.userEmail || "-";
 };
 
+const cartCustomerLabel = (cart: OpenCart): string | null => {
+  const name = [cart.billingAddress?.firstName, cart.billingAddress?.lastName]
+    .filter(Boolean)
+    .join(" ");
+
+  // Email first: it's what you'd use to follow up on the cart.
+  return cart.email || name || null;
+};
+
+const OpenCartsCard = ({
+  loading,
+  carts,
+}: {
+  loading: boolean;
+  carts?: OpenCart[];
+}): React.ReactNode => {
+  const intl = useIntl();
+  const totals = useMemo(
+    () => sumByCurrency((carts ?? []).map(cart => cart.totalPrice.gross)),
+    [carts],
+  );
+
+  return (
+    <AssignableListCard
+      data-test-id="store-home-open-carts"
+      title={<FormattedMessage {...messages.openCarts} values={{ days: OPEN_CARTS_WINDOW_DAYS }} />}
+      headerEnd={
+        !loading && carts && carts.length > 0 ? (
+          <Text size={2} color="default2">
+            <FormattedMessage {...messages.openCartsSummary} values={{ count: carts.length }} />
+            {totals.map(total => (
+              <span key={total.currency}>
+                {" · "}
+                <Money money={total} />
+              </span>
+            ))}
+          </Text>
+        ) : null
+      }
+    >
+      <AssignableListTable<OpenCart>
+        rowTestId="store-home-open-cart-row"
+        items={loading ? undefined : (carts ?? [])}
+        selection="none"
+        leadingInset={ASSIGNABLE_LIST_TABLE_CARD_LEADING_INSET}
+        emptyMessage={
+          <FormattedMessage {...messages.noOpenCarts} values={{ days: OPEN_CARTS_WINDOW_DAYS }} />
+        }
+        emptyIcon={
+          <Box color="default2" display="flex" aria-hidden>
+            <ShoppingBasket size={iconSize.large} strokeWidth={iconStrokeWidthBySize.large} />
+          </Box>
+        }
+        columns={[
+          {
+            id: "customer",
+            width: "28%",
+            header: <FormattedMessage {...messages.customerColumn} />,
+          },
+          {
+            id: "items",
+            width: "32%",
+            header: <FormattedMessage {...messages.itemsColumn} />,
+          },
+          {
+            id: "quantity",
+            width: "8%",
+            align: "end",
+            header: <FormattedMessage {...messages.quantityColumn} />,
+          },
+          {
+            id: "updated",
+            width: "17%",
+            header: <FormattedMessage {...messages.lastActivityColumn} />,
+          },
+          {
+            id: "total",
+            width: "15%",
+            align: "end",
+            header: <FormattedMessage {...messages.totalColumn} />,
+          },
+        ]}
+        renderCells={cart => {
+          const [firstLine] = cart.lines;
+          const customer = cartCustomerLabel(cart);
+
+          return (
+            <>
+              <AssignableListCell truncate>
+                <Text ellipsis display="block" size={2} color={customer ? "default1" : "default2"}>
+                  {customer ?? <FormattedMessage {...messages.guestCustomer} />}
+                </Text>
+              </AssignableListCell>
+              <AssignableListCell truncate>
+                {firstLine ? (
+                  <Link to={productUrl(firstLine.variant.product.id)} className={styles.cellLink}>
+                    <Text ellipsis display="block" size={2}>
+                      {cart.lines.length > 1
+                        ? intl.formatMessage(messages.cartItems, {
+                            name: firstLine.variant.product.name,
+                            more: cart.lines.length - 1,
+                          })
+                        : firstLine.variant.product.name}
+                    </Text>
+                  </Link>
+                ) : null}
+              </AssignableListCell>
+              <AssignableListCell align="end">
+                <Text size={2}>{cart.quantity}</Text>
+              </AssignableListCell>
+              <AssignableListCell truncate>
+                <DateTime date={cart.updatedAt} plain />
+              </AssignableListCell>
+              <AssignableListCell align="end">
+                <Money money={cart.totalPrice.gross} />
+              </AssignableListCell>
+            </>
+          );
+        }}
+      />
+    </AssignableListCard>
+  );
+};
+
 const QuickLink = ({
   to,
   icon,
@@ -170,11 +306,13 @@ export const StoreHomeView = ({
   hasError,
   canManageOrders,
   canManageProducts,
+  canManageCheckouts,
   toFulfillCount,
   unconfirmedCount,
   outOfStockCount,
   sales,
   recentOrders,
+  openCarts,
 }: StoreHomeViewProps): React.ReactNode => {
   const intl = useIntl();
 
@@ -271,87 +409,88 @@ export const StoreHomeView = ({
       </Box>
 
       <Box className={styles.columns}>
-        {canManageOrders ? (
-          <AssignableListCard
-            data-test-id="store-home-recent-orders"
-            title={<FormattedMessage {...messages.recentOrders} />}
-            headerEnd={
-              <Link to={orderListUrlWithChannel(channel)}>
-                <Button variant="secondary">
-                  <FormattedMessage {...messages.viewAllOrders} />
-                </Button>
-              </Link>
-            }
-          >
-            <AssignableListTable<RecentOrder>
-              rowTestId="store-home-order-row"
-              items={loading ? undefined : (recentOrders ?? [])}
-              selection="none"
-              getRowHref={order => orderUrl(order.id)}
-              getRowLabel={order => `#${order.number}`}
-              leadingInset={ASSIGNABLE_LIST_TABLE_CARD_LEADING_INSET}
-              emptyMessage={<FormattedMessage {...messages.noOrders} />}
-              emptyIcon={
-                <Box color="default2" display="flex" aria-hidden>
-                  <ShoppingCart size={iconSize.large} strokeWidth={iconStrokeWidthBySize.large} />
-                </Box>
+        <Box display="flex" flexDirection="column" gap={4} minWidth={0}>
+          {canManageOrders ? (
+            <AssignableListCard
+              data-test-id="store-home-recent-orders"
+              title={<FormattedMessage {...messages.recentOrders} />}
+              headerEnd={
+                <Link to={orderListUrlWithChannel(channel)}>
+                  <Button variant="secondary">
+                    <FormattedMessage {...messages.viewAllOrders} />
+                  </Button>
+                </Link>
               }
-              columns={[
-                {
-                  id: "number",
-                  width: "12%",
-                  header: <FormattedMessage {...messages.orderColumn} />,
-                },
-                {
-                  id: "date",
-                  width: "20%",
-                  header: <FormattedMessage {...messages.dateColumn} />,
-                },
-                {
-                  id: "customer",
-                  width: "30%",
-                  header: <FormattedMessage {...messages.customerColumn} />,
-                },
-                {
-                  id: "status",
-                  width: "20%",
-                  header: <FormattedMessage {...messages.statusColumn} />,
-                },
-                {
-                  id: "total",
-                  width: "18%",
-                  align: "end",
-                  header: <FormattedMessage {...messages.totalColumn} />,
-                },
-              ]}
-              renderCells={order => (
-                <>
-                  <AssignableListCell truncate>
-                    <Text ellipsis display="block" size={2}>
-                      #{order.number}
-                    </Text>
-                  </AssignableListCell>
-                  <AssignableListCell truncate>
-                    <DateTime date={order.created} plain />
-                  </AssignableListCell>
-                  <AssignableListCell truncate>
-                    <Text ellipsis display="block" size={2}>
-                      {customerLabel(order)}
-                    </Text>
-                  </AssignableListCell>
-                  <AssignableListCell>
-                    <OrderStatusPill status={order.status} />
-                  </AssignableListCell>
-                  <AssignableListCell align="end">
-                    <Money money={order.total.gross} />
-                  </AssignableListCell>
-                </>
-              )}
-            />
-          </AssignableListCard>
-        ) : (
-          <Box />
-        )}
+            >
+              <AssignableListTable<RecentOrder>
+                rowTestId="store-home-order-row"
+                items={loading ? undefined : (recentOrders ?? [])}
+                selection="none"
+                getRowHref={order => orderUrl(order.id)}
+                getRowLabel={order => `#${order.number}`}
+                leadingInset={ASSIGNABLE_LIST_TABLE_CARD_LEADING_INSET}
+                emptyMessage={<FormattedMessage {...messages.noOrders} />}
+                emptyIcon={
+                  <Box color="default2" display="flex" aria-hidden>
+                    <ShoppingCart size={iconSize.large} strokeWidth={iconStrokeWidthBySize.large} />
+                  </Box>
+                }
+                columns={[
+                  {
+                    id: "number",
+                    width: "12%",
+                    header: <FormattedMessage {...messages.orderColumn} />,
+                  },
+                  {
+                    id: "date",
+                    width: "20%",
+                    header: <FormattedMessage {...messages.dateColumn} />,
+                  },
+                  {
+                    id: "customer",
+                    width: "30%",
+                    header: <FormattedMessage {...messages.customerColumn} />,
+                  },
+                  {
+                    id: "status",
+                    width: "20%",
+                    header: <FormattedMessage {...messages.statusColumn} />,
+                  },
+                  {
+                    id: "total",
+                    width: "18%",
+                    align: "end",
+                    header: <FormattedMessage {...messages.totalColumn} />,
+                  },
+                ]}
+                renderCells={order => (
+                  <>
+                    <AssignableListCell truncate>
+                      <Text ellipsis display="block" size={2}>
+                        #{order.number}
+                      </Text>
+                    </AssignableListCell>
+                    <AssignableListCell truncate>
+                      <DateTime date={order.created} plain />
+                    </AssignableListCell>
+                    <AssignableListCell truncate>
+                      <Text ellipsis display="block" size={2}>
+                        {customerLabel(order)}
+                      </Text>
+                    </AssignableListCell>
+                    <AssignableListCell>
+                      <OrderStatusPill status={order.status} />
+                    </AssignableListCell>
+                    <AssignableListCell align="end">
+                      <Money money={order.total.gross} />
+                    </AssignableListCell>
+                  </>
+                )}
+              />
+            </AssignableListCard>
+          ) : null}
+          {canManageCheckouts ? <OpenCartsCard loading={loading} carts={openCarts} /> : null}
+        </Box>
 
         <DetailSettingsCard
           title={<FormattedMessage {...messages.quickLinks} />}
@@ -391,22 +530,28 @@ export const StoreHome = (): React.ReactNode => {
   const { user } = useUser();
   const canManageOrders = !!user && !!hasPermission(PermissionEnum.MANAGE_ORDERS, user);
   const canManageProducts = !!user && !!hasPermission(PermissionEnum.MANAGE_PRODUCTS, user);
+  const canManageCheckouts = !!user && !!hasPermission(PermissionEnum.MANAGE_CHECKOUTS, user);
   // Stock availability is per channel, and Saleor rejects the products query without one
   // once the store has several channels, so the whole overview follows the selected channel.
   const { channel, setChannel } = useAppChannel(false);
   const channels = user?.accessibleChannels ?? [];
   // Fixed per mount so the query variables (and Apollo cache key) stay stable.
   const since = useMemo(() => startOfDayDaysAgo(SALES_WINDOW_DAYS - 1), []);
+  // The checkout `updatedAt` filter takes a date; the exact cutoff is applied client-side.
+  const cartsSince = useMemo(() => startOfDayDaysAgo(OPEN_CARTS_WINDOW_DAYS - 1), []);
+  const cartsSinceDate = useMemo(() => localDateDaysAgo(OPEN_CARTS_WINDOW_DAYS), []);
 
   const { data, loading, error } = useHomeStoreOverviewQuery({
     variables: {
       channel: channel?.slug ?? "",
       channelId: channel?.id ?? "",
       since,
+      cartsSince: cartsSinceDate,
       hasManageOrders: canManageOrders,
       hasManageProducts: canManageProducts,
+      hasManageCheckouts: canManageCheckouts,
     },
-    skip: !channel || (!canManageOrders && !canManageProducts),
+    skip: !channel || (!canManageOrders && !canManageProducts && !canManageCheckouts),
     fetchPolicy: "cache-and-network",
   });
 
@@ -424,6 +569,16 @@ export const StoreHome = (): React.ReactNode => {
     };
   }, [data?.recentSales]);
 
+  const openCarts = useMemo((): OpenCart[] | undefined => {
+    const carts = data?.openCarts;
+
+    if (!carts) {
+      return undefined;
+    }
+
+    return selectOpenCarts(mapEdgesToItems(carts) ?? [], cartsSince);
+  }, [data?.openCarts, cartsSince]);
+
   return (
     <StoreHomeView
       firstName={user?.firstName}
@@ -434,11 +589,13 @@ export const StoreHome = (): React.ReactNode => {
       hasError={!!error && !data}
       canManageOrders={canManageOrders}
       canManageProducts={canManageProducts}
+      canManageCheckouts={canManageCheckouts}
       toFulfillCount={data?.toFulfill?.totalCount}
       unconfirmedCount={data?.unconfirmed?.totalCount}
       outOfStockCount={data?.outOfStock?.totalCount}
       sales={sales}
       recentOrders={mapEdgesToItems(data?.recentOrders) ?? undefined}
+      openCarts={openCarts}
     />
   );
 };

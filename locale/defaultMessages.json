@@ -957,6 +957,10 @@
     "context": "order draft total price",
     "string": "Total"
   },
+  "1WY1RV": {
+    "context": "store home open carts column, number of items in cart",
+    "string": "Qty"
+  },
   "1WbTJ5": {
     "context": "product variants, title",
     "string": "Variants"
@@ -3355,6 +3359,10 @@
   "AkyGP2": {
     "string": "Channel deleted"
   },
+  "AmjheX": {
+    "context": "store home open carts column",
+    "string": "Last activity"
+  },
   "AnqH4p": {
     "context": "sale status",
     "string": "Active"
@@ -4067,6 +4075,10 @@
   },
   "DACqZK": {
     "string": "They should check their email and use the link to set a password."
+  },
+  "DBYwfH": {
+    "context": "store home open cart items summary, first product name plus count of other products in the cart",
+    "string": "{name} +{more} more"
   },
   "DBuWYc": {
     "context": "voucher list status after end date",
@@ -4957,6 +4969,10 @@
   },
   "GgvbdW": {
     "string": "Model types"
+  },
+  "GhOvwv": {
+    "context": "store home open carts card title; checkouts not yet completed",
+    "string": "Open carts, last {days} days"
   },
   "GhSB79": {
     "context": "model status",
@@ -6832,6 +6848,10 @@
   "NWxomz": {
     "string": "Fulfillment status"
   },
+  "NXBx4F": {
+    "context": "store home open cart without customer email",
+    "string": "Guest"
+  },
   "NYwJyM": {
     "context": "inline add attribute value placeholder",
     "string": "Type a value and press Enter"
@@ -8438,6 +8458,10 @@
     "context": "grant refund, refund card toggle",
     "string": "Refund shipment: {currency} {amount}"
   },
+  "Tf+50R": {
+    "context": "store home open carts empty state",
+    "string": "No carts with items in the last {days} days"
+  },
   "TfzIXS": {
     "context": "tax classes card header",
     "string": "General information"
@@ -8967,6 +8991,10 @@
   },
   "Vf57Ie": {
     "string": "Partially fulfilled"
+  },
+  "VgalSb": {
+    "context": "store home open carts card header count",
+    "string": "{count, plural, one {# cart} other {# carts}}"
   },
   "VhAHLQ": {
     "context": "assign picker, client-side filter emptied the loaded pages",
@@ -13764,6 +13792,10 @@
   "nEixpu": {
     "context": "table action",
     "string": "Actions"
+  },
+  "nF5iBV": {
+    "context": "store home open carts column",
+    "string": "Items"
   },
   "nG1+Cz": {
     "context": "staff members status active",

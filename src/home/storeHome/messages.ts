@@ -86,6 +86,47 @@ export const messages = defineMessages({
     defaultMessage: "Total",
     description: "store home recent orders column",
   },
+  openCarts: {
+    id: "GhOvwv",
+    defaultMessage: "Open carts, last {days} days",
+    description: "store home open carts card title; checkouts not yet completed",
+  },
+  openCartsSummary: {
+    id: "VgalSb",
+    defaultMessage: "{count, plural, one {# cart} other {# carts}}",
+    description: "store home open carts card header count",
+  },
+  noOpenCarts: {
+    id: "Tf+50R",
+    defaultMessage: "No carts with items in the last {days} days",
+    description: "store home open carts empty state",
+  },
+  itemsColumn: {
+    id: "nF5iBV",
+    defaultMessage: "Items",
+    description: "store home open carts column",
+  },
+  quantityColumn: {
+    id: "1WY1RV",
+    defaultMessage: "Qty",
+    description: "store home open carts column, number of items in cart",
+  },
+  lastActivityColumn: {
+    id: "AmjheX",
+    defaultMessage: "Last activity",
+    description: "store home open carts column",
+  },
+  cartItems: {
+    id: "DBYwfH",
+    defaultMessage: "{name} +{more} more",
+    description:
+      "store home open cart items summary, first product name plus count of other products in the cart",
+  },
+  guestCustomer: {
+    id: "NXBx4F",
+    defaultMessage: "Guest",
+    description: "store home open cart without customer email",
+  },
   quickLinks: {
     id: "1Km7Y2",
     defaultMessage: "Quick actions",

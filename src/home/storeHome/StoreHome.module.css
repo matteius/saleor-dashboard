@@ -85,3 +85,14 @@ a.tile:focus-visible {
 .quickLink:hover {
   background-color: var(--mu-colors-background-default1-hovered);
 }
+
+.cellLink {
+  display: block;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cellLink:hover {
+  text-decoration: underline;
+}
