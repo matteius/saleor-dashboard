@@ -25,6 +25,23 @@ export const SentryAdapter = (config: Config): TrackerMethods => {
     if (config?.dsn) {
       Sentry.init({
         dsn: config.dsn,
+        sendDefaultPii: false,
+        beforeSend(event) {
+          delete event.user;
+
+          if (event.request) {
+            delete event.request.data;
+            delete event.request.cookies;
+            delete event.request.headers;
+            delete event.request.query_string;
+
+            if (event.request.url) event.request.url = event.request.url.split(/[?#]/)[0];
+          }
+
+          event.breadcrumbs = event.breadcrumbs?.filter(item => item.category !== "console");
+
+          return event;
+        },
         environment: config.environment,
         release: config.release,
         ignoreErrors: [
