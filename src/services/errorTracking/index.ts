@@ -8,7 +8,7 @@ export const errorTracker = ErrorTrackerFactory(
     // todo install t3/env
     dsn: process.env.SENTRY_DSN as string,
     environment: process.env.ENVIRONMENT,
-    release: process.env.RELEASE_NAME,
+    release: process.env.SENTRY_RELEASE,
     apiUrl: getAbsoluteApiUrl(),
   }),
 );

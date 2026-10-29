@@ -73,7 +73,7 @@ export default defineConfig(({ command, mode }) => {
     Object.entries(env).filter(([flagKey]) => flagKey.startsWith("FF_")),
   );
 
-  const sourcemap = !SKIP_SOURCEMAPS;
+  const sourcemap = SENTRY_AUTH_TOKEN ? "hidden" : !SKIP_SOURCEMAPS;
 
   const plugins = [
     react(),
@@ -110,6 +110,8 @@ export default defineConfig(({ command, mode }) => {
         authToken: SENTRY_AUTH_TOKEN,
         org: SENTRY_ORG,
         project: SENTRY_PROJECT,
+        release: { name: SENTRY_RELEASE },
+        sourcemaps: { filesToDeleteAfterUpload: ["build/**/*.map"] },
       }),
     );
   }

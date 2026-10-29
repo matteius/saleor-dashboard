@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM node:24-alpine AS builder
 RUN apk --no-cache add bash
 RUN corepack enable && corepack prepare pnpm@11.13.1 --activate
@@ -20,6 +21,10 @@ COPY .featureFlags/ .featureFlags/
 
 COPY src/ src/
 
+ARG SENTRY_RELEASE
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
+ENV SENTRY_DSN=https://821d69024b5ed247f829012ab94a3d69@o4512337837686784.ingest.us.sentry.io/4512337954275328
+ENV SENTRY_ORG=opensensor-engineering SENTRY_PROJECT=saleor-dashboard ENVIRONMENT=production
 ARG API_URL
 ARG APP_MOUNT_URI
 ARG EXTENSIONS_API_URL
@@ -34,7 +39,7 @@ ENV STATIC_URL="${STATIC_URL:-/dashboard/}"
 ENV SKIP_SOURCEMAPS="${SKIP_SOURCEMAPS:-true}"
 ENV LOCALE_CODE="${LOCALE_CODE:-EN}"
 RUN pnpm run generate:main
-RUN pnpm exec cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build
+RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN pnpm exec cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build
 
 FROM nginx:stable-alpine AS runner
 WORKDIR /app
