@@ -52,11 +52,11 @@ def validate(run):
     if (
         run["repository"]["full_name"] != REPO
         or run["path"] != WORKFLOW
-        or run["event"] != "push"
+        or run["event"] not in ("push", "workflow_dispatch")
         or run["head_branch"] != "main"
         or not re.fullmatch("[a-f0-9]{40}", run["head_sha"])
     ):
-        raise ValueError("Expected an exact main push from this repository")
+        raise ValueError("Expected an exact main push or dispatch from this repository")
     return {
         "commit": run["head_sha"],
         "run_id": run["id"],
@@ -66,11 +66,12 @@ def validate(run):
 
 def latest():
     runs = gh(
-        f"repos/{REPO}/actions/workflows/opensensor-image.yml/runs?branch=main&event=push&per_page=1"
+        f"repos/{REPO}/actions/workflows/opensensor-image.yml/runs?branch=main&per_page=30"
     )["workflow_runs"]
-    if not runs:
+    run = next((r for r in runs if r["event"] in ("push", "workflow_dispatch")), None)
+    if run is None:
         return None
-    target = validate(runs[0])
+    target = validate(run)
     jobs = gh(
         f'repos/{REPO}/actions/runs/{target["run_id"]}/attempts/{target["attempt"]}/jobs?per_page=100'
     )["jobs"]

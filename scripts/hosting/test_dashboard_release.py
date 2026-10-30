@@ -35,6 +35,52 @@ def deployment(commit=SHA):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_main_push_and_dispatch_require_the_same_source_identity(self):
+        run = {
+            "repository": {"full_name": release.REPO},
+            "path": release.WORKFLOW,
+            "event": "push",
+            "head_branch": "main",
+            "head_sha": SHA,
+            "id": 1,
+            "run_attempt": 1,
+        }
+        for event in ("push", "workflow_dispatch"):
+            with self.subTest(event=event):
+                self.assertEqual(release.validate({**run, "event": event}), TARGET)
+        for invalid in (
+            {"event": "pull_request"},
+            {"head_branch": "feature"},
+            {"repository": {"full_name": "unrelated/dashboard"}},
+            {"path": ".github/workflows/unrelated.yml"},
+            {"head_sha": "main"},
+        ):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                release.validate({**run, **invalid})
+
+    def test_latest_accepts_tested_main_dispatch_and_ignores_pr(self):
+        run = {
+            "repository": {"full_name": release.REPO},
+            "path": release.WORKFLOW,
+            "event": "workflow_dispatch",
+            "head_branch": "main",
+            "head_sha": SHA,
+            "id": 1,
+            "run_attempt": 1,
+        }
+        for result in ("success", "failure", None):
+            with self.subTest(result=result), patch.object(
+                release,
+                "gh",
+                side_effect=[
+                    {"workflow_runs": [{**run, "event": "pull_request"}, run]},
+                    {"jobs": [{"name": "release-tests", "conclusion": result}]},
+                ],
+            ):
+                self.assertEqual(
+                    release.latest(), TARGET if result == "success" else None
+                )
+
     def test_no_rebuild_of_exact_active_source(self):
         with tempfile.TemporaryDirectory() as root, patch.object(
             release, "provider", return_value=app(deployment())
