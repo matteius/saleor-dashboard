@@ -1,0 +1,10 @@
+[Unit]
+Description=Watch for production dashboard main releases
+
+[Timer]
+OnBootSec=60s
+OnUnitInactiveSec=60s
+Unit=opensensor-dashboard-release.service
+
+[Install]
+WantedBy=timers.target
