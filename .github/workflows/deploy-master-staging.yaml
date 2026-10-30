@@ -9,6 +9,7 @@ permissions: {}
 
 jobs:
   build:
+    if: github.repository == 'saleor/saleor-dashboard'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -153,7 +154,7 @@ jobs:
 
   notify-slack:
     needs: [build, deploy]
-    if: always()
+    if: always() && github.repository == 'saleor/saleor-dashboard'
     permissions: {}
     uses: saleor/saleor-internal-actions/.github/workflows/notify-slack.yaml@eb0c692da7bf13f5e1a82c17488b24c514dd10a1 # v1.10.0
     with:

@@ -123,6 +123,7 @@ jobs:
           flags: storybook
 
   chromatic:
+    if: github.repository == 'saleor/saleor-dashboard' || vars.CHROMATIC_ENABLED == 'true'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
